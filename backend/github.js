@@ -119,6 +119,18 @@ async function githubFetch(url, options, token) {
     });
   }
   if (response.status === 401) {
+    if (token) {
+      try {
+        const publicResponse = await fetch(url, {
+          ...options,
+          headers: buildHeaders({ accept: options?.accept }),
+          signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        });
+        if (publicResponse.ok) return publicResponse;
+      } catch {
+        // Fall through to the clear invalid-token error below.
+      }
+    }
     throw new GitHubError('invalid-token', 'The configured GITHUB_TOKEN was rejected by GitHub.', 500);
   }
   if (response.status === 404) {

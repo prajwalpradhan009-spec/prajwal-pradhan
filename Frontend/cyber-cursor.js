@@ -49,6 +49,8 @@
       previousX: -100,
       previousY: -100,
       previousTime: 0,
+      lastFrameTime: 0,
+      hoverTarget: null,
       visible: false,
       magnetOffsetX: 0,
       magnetOffsetY: 0,
@@ -130,10 +132,22 @@
 
     function render(now) {
       state.frame = 0;
+      const elapsed = state.lastFrameTime
+        ? Math.min(50, Math.max(0, now - state.lastFrameTime))
+        : 16.67;
+      const frameScale = elapsed / 16.67;
+      const followAmount = 1 - Math.pow(0.66, frameScale);
+      state.lastFrameTime = now;
+
+      [state.magnetOffsetX, state.magnetOffsetY] = getMagnetOffset(
+        state.hoverTarget,
+        state.pointerX,
+        state.pointerY
+      );
       const targetX = state.pointerX + state.magnetOffsetX;
       const targetY = state.pointerY + state.magnetOffsetY;
-      state.hudX += (targetX - state.hudX) * 0.34;
-      state.hudY += (targetY - state.hudY) * 0.34;
+      state.hudX += (targetX - state.hudX) * followAmount;
+      state.hudY += (targetY - state.hudY) * followAmount;
 
       cursor.style.setProperty('--cyber-hud-x', `${state.hudX - state.pointerX}px`);
       cursor.style.setProperty('--cyber-hud-y', `${state.hudY - state.pointerY}px`);
@@ -162,10 +176,10 @@
         if (age >= particle.life) return false;
 
         const progress = age / particle.life;
-        particle.x += particle.vx;
-        particle.y += particle.vy;
-        particle.vx *= 0.97;
-        particle.vy *= 0.97;
+        particle.x += particle.vx * frameScale;
+        particle.y += particle.vy * frameScale;
+        particle.vx *= Math.pow(0.97, frameScale);
+        particle.vy *= Math.pow(0.97, frameScale);
         const opacity = 1 - progress;
         const size = particle.radius * (1 - progress * 0.55);
 
@@ -191,6 +205,7 @@
       const speed = Math.min(7, distance / elapsed);
       state.pointerX = event.clientX;
       state.pointerY = event.clientY;
+      state.hoverTarget = event.target;
 
       if (!state.visible) {
         state.hudX = state.pointerX;
@@ -200,12 +215,6 @@
       cursor.style.transform = `translate3d(${state.pointerX}px, ${state.pointerY}px, 0)`;
       cursor.classList.add('is-visible');
       updateHover(event.target);
-      [state.magnetOffsetX, state.magnetOffsetY] = getMagnetOffset(
-        event.target,
-        state.pointerX,
-        state.pointerY
-      );
-
       if (distance > 2) {
         const color = Math.random() < 0.38 ? 1 : 0;
         state.trail.push({ x: state.pointerX, y: state.pointerY, time: now, speed, color });
@@ -263,6 +272,7 @@
       state.previousX = -100;
       state.previousY = -100;
       state.previousTime = 0;
+      state.hoverTarget = null;
       state.magnetOffsetX = 0;
       state.magnetOffsetY = 0;
       cursor.classList.remove('is-visible');
