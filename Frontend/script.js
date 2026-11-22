@@ -124,8 +124,10 @@ function syncHeaderOffset() {
   scrollRoot.style.setProperty('--header-offset', `${height}px`);
   return height;
 }
-syncHeaderOffset();
-window.addEventListener('resize', syncHeaderOffset, { passive: true });
+let currentHeaderOffset = syncHeaderOffset();
+window.addEventListener('resize', () => {
+  currentHeaderOffset = syncHeaderOffset();
+}, { passive: true });
 
 /* ------------------------------------------------- typewriter effect */
 const phrases = ['Full-Stack Development', 'Python Development', 'Creative Problem Solving', 'Building for the web'];
@@ -146,8 +148,9 @@ if (typedText) {
 }
 
 /* ------------------------------------------------- stats counter animation */
+let hasAnimatedStats = false;
 function animateCounts() {
-  document.querySelectorAll('.active-page [data-count], [data-count]').forEach(counter => {
+  document.querySelectorAll('[data-count]').forEach(counter => {
     const target = Number(counter.dataset.count);
     if (isNaN(target)) return;
     let value = 0;
@@ -170,19 +173,17 @@ const revealObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
     if (!entry.isIntersecting) return;
     entry.target.classList.add('visible');
-    if (entry.target.classList.contains('stats')) animateCounts();
+    if (entry.target.classList.contains('stats') && !hasAnimatedStats) {
+      hasAnimatedStats = true;
+      animateCounts();
+    }
     revealObserver.unobserve(entry.target);
   });
 }, { threshold: 0.12 });
 
-function observeActiveReveals(container) {
-  const target = container || document.querySelector('.active-page') || document;
-  target.querySelectorAll('.reveal, .stats').forEach(el => {
-    revealObserver.observe(el);
-  });
-}
+document.querySelectorAll('.reveal, .stats').forEach(el => revealObserver.observe(el));
 
-/* ------------------------------------------------- Multi-Page Router */
+/* ------------------------------------------------- Multi-Page Router & Vertical Scroll */
 const PAGES = {
   home: {
     id: 'page-home',
@@ -252,7 +253,45 @@ function resolvePageKey(input) {
 }
 
 let currentPage = null;
-let isTransitioning = false;
+let isProgrammaticScrolling = false;
+let scrollLockTimer = null;
+let scrollToken = 0;
+
+function easeInOutCubic(t) {
+  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+}
+
+function animateScrollTo(targetY, onComplete) {
+  const startY = window.scrollY;
+  const distance = targetY - startY;
+  if (Math.abs(distance) < 2) {
+    if (onComplete) onComplete();
+    return;
+  }
+
+  isProgrammaticScrolling = true;
+  scrollRoot.classList.add('is-programmatic-scroll');
+  const token = ++scrollToken;
+  const duration = Math.min(850, Math.max(340, Math.abs(distance) * 0.45));
+  const startTime = performance.now();
+
+  const step = now => {
+    if (token !== scrollToken) return;
+    const progress = Math.min((now - startTime) / duration, 1);
+    window.scrollTo(0, startY + distance * easeInOutCubic(progress));
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      scrollRoot.classList.remove('is-programmatic-scroll');
+      clearTimeout(scrollLockTimer);
+      scrollLockTimer = setTimeout(() => {
+        isProgrammaticScrolling = false;
+      }, 100);
+      if (onComplete) onComplete();
+    }
+  };
+  requestAnimationFrame(step);
+}
 
 function updateActiveNav(pageKey) {
   const allNavLinks = document.querySelectorAll('.nav-links a[data-nav], .nav-links a:not(.resume-link)');
@@ -263,16 +302,7 @@ function updateActiveNav(pageKey) {
   });
 }
 
-function activatePageHooks(pageKey, targetView) {
-  // Staggered reveals for newly active page
-  const view = targetView || document.getElementById(PAGES[pageKey]?.id);
-  if (view) {
-    view.querySelectorAll('.reveal, .stats').forEach(el => {
-      el.classList.remove('visible');
-      revealObserver.observe(el);
-    });
-  }
-
+function activateSectionFeatures(pageKey) {
   if (pageKey === 'about') {
     animateCounts();
   } else if (pageKey === 'skills') {
@@ -280,69 +310,105 @@ function activatePageHooks(pageKey, targetView) {
   } else if (pageKey === 'github') {
     if (typeof window.loadGitHubDashboard === 'function') window.loadGitHubDashboard();
   }
-
-  lucide.createIcons();
 }
 
-function navigateTo(pageKey, updateHistory = true) {
-  const targetConf = PAGES[pageKey] || PAGES.home;
-  const targetId = targetConf.id;
-  const targetView = document.getElementById(targetId);
-  if (!targetView) return;
-
-  if (currentPage === pageKey) {
-    window.scrollTo({ top: 0, behavior: reduceMotionQuery.matches ? 'auto' : 'smooth' });
-    return;
-  }
-
-  if (isTransitioning) return;
-
-  const currentView = currentPage ? document.getElementById(PAGES[currentPage]?.id) : null;
+function setCurrentActiveSection(pageKey, updateUrl = true) {
+  if (currentPage === pageKey) return;
   currentPage = pageKey;
-  document.title = targetConf.title;
+  const pageConf = PAGES[pageKey] || PAGES.home;
+
+  document.title = pageConf.title;
   updateActiveNav(pageKey);
 
-  if (updateHistory) {
+  document.querySelectorAll('.page-view').forEach(view => {
+    const isTarget = view.id === pageConf.id;
+    view.classList.toggle('active-page', isTarget);
+    view.classList.toggle('section-in-view', isTarget);
+  });
+
+  activateSectionFeatures(pageKey);
+
+  if (updateUrl && !isProgrammaticScrolling) {
     const isFile = window.location.protocol === 'file:';
-    const targetUrl = isFile ? `#${pageKey}` : targetConf.path;
+    const targetUrl = isFile ? `#${pageKey}` : pageConf.path;
     try {
-      history.pushState({ page: pageKey }, targetConf.title, targetUrl);
+      history.replaceState({ page: pageKey }, pageConf.title, targetUrl);
+    } catch {
+      window.location.hash = pageKey;
+    }
+  }
+}
+
+function scrollToPage(pageKey, pushHistory = true) {
+  const pageConf = PAGES[pageKey] || PAGES.home;
+  const targetView = document.getElementById(pageConf.id);
+  if (!targetView) return;
+
+  currentHeaderOffset = syncHeaderOffset();
+  const targetY = pageKey === 'home'
+    ? 0
+    : Math.max(0, Math.round(window.scrollY + targetView.getBoundingClientRect().top - (currentHeaderOffset + 18)));
+
+  setCurrentActiveSection(pageKey, false);
+
+  if (pushHistory) {
+    const isFile = window.location.protocol === 'file:';
+    const targetUrl = isFile ? `#${pageKey}` : pageConf.path;
+    try {
+      history.pushState({ page: pageKey }, pageConf.title, targetUrl);
     } catch {
       window.location.hash = pageKey;
     }
   }
 
-  if (!currentView || reduceMotionQuery.matches) {
-    document.querySelectorAll('.page-view').forEach(v => {
-      v.classList.remove('active-page', 'page-exit');
-    });
-    targetView.classList.add('active-page');
-    window.scrollTo(0, 0);
-    activatePageHooks(pageKey, targetView);
-    return;
+  if (reduceMotionQuery.matches) {
+    window.scrollTo(0, targetY);
+  } else {
+    animateScrollTo(targetY);
   }
-
-  isTransitioning = true;
-  currentView.classList.add('page-exit');
-
-  setTimeout(() => {
-    currentView.classList.remove('active-page', 'page-exit');
-    targetView.classList.add('active-page');
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    activatePageHooks(pageKey, targetView);
-    setTimeout(() => {
-      isTransitioning = false;
-    }, 80);
-  }, 220);
 }
 
-// Global page jump hook
 window.navigateToPage = function(key) {
   const resolved = resolvePageKey(key);
-  if (resolved) navigateTo(resolved);
+  if (resolved) scrollToPage(resolved);
 };
 
-// Mobile menu toggle
+/* ------------------------------------------------- Scroll Spy (Intersection Observer) */
+const pageViews = [...document.querySelectorAll('.page-view')];
+if (pageViews.length) {
+  const scrollSpyObserver = new IntersectionObserver(
+    entries => {
+      if (isProgrammaticScrolling) return;
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const key = resolvePageKey(entry.target.dataset.page || entry.target.id);
+          if (key) {
+            setCurrentActiveSection(key, true);
+          }
+        }
+      });
+    },
+    {
+      rootMargin: '-25% 0px -45% 0px',
+      threshold: [0, 0.2, 0.5]
+    }
+  );
+
+  pageViews.forEach(view => scrollSpyObserver.observe(view));
+}
+
+// User scroll intervention interrupts programmatic scroll
+for (const type of ['wheel', 'touchstart', 'pointerdown']) {
+  window.addEventListener(type, () => {
+    if (scrollRoot.classList.contains('is-programmatic-scroll')) {
+      scrollToken++;
+      scrollRoot.classList.remove('is-programmatic-scroll');
+      isProgrammaticScrolling = false;
+    }
+  }, { passive: true });
+}
+
+/* ------------------------------------------------- Mobile Menu & Click Routing */
 menuToggle.addEventListener('click', () => {
   const isOpen = navLinks.classList.toggle('open');
   menuToggle.setAttribute('aria-expanded', isOpen);
@@ -350,7 +416,6 @@ menuToggle.addEventListener('click', () => {
   lucide.createIcons();
 });
 
-// Click interceptor for navigation
 document.addEventListener('click', event => {
   if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
 
@@ -371,17 +436,16 @@ document.addEventListener('click', event => {
     menuToggle.innerHTML = '<i data-lucide="menu"></i>';
     lucide.createIcons();
 
-    navigateTo(pageKey);
+    scrollToPage(pageKey, true);
   }
 });
 
-// Browser back and forward button navigation
 window.addEventListener('popstate', event => {
   const pageKey = event.state?.page || resolvePageKey(window.location.pathname) || resolvePageKey(window.location.hash) || 'home';
-  navigateTo(pageKey, false);
+  scrollToPage(pageKey, false);
 });
 
-// Initial page resolution
+/* ------------------------------------------------- Initial Section Resolution */
 function getInitialPage() {
   if (window.location.hash) {
     const pageFromHash = resolvePageKey(window.location.hash);
@@ -393,23 +457,13 @@ function getInitialPage() {
 }
 
 const initialPage = getInitialPage();
-currentPage = initialPage;
-document.title = PAGES[initialPage].title;
+setCurrentActiveSection(initialPage, false);
 
-document.querySelectorAll('.page-view').forEach(v => {
-  v.classList.remove('active-page', 'page-exit');
-});
-
-const initialView = document.getElementById(PAGES[initialPage].id);
-if (initialView) {
-  initialView.classList.add('active-page');
-} else {
-  const fallbackHome = document.getElementById('page-home');
-  if (fallbackHome) fallbackHome.classList.add('active-page');
+if (initialPage !== 'home') {
+  setTimeout(() => {
+    scrollToPage(initialPage, false);
+  }, 100);
 }
-
-updateActiveNav(initialPage);
-activatePageHooks(initialPage, initialView);
 
 /* ------------------------------------------------- Contact Form Handling */
 const contactForm = document.querySelector('.contact-form');
