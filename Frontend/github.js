@@ -737,5 +737,6 @@
     if (ageSeconds > (latest.meta.cacheTtlSeconds || 600) + 60) load();
   });
 
+  window.loadGitHubDashboard = load;
   load();
 })();

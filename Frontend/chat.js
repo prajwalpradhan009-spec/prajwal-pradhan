@@ -403,8 +403,12 @@
   /* ------------------------------------------------------------- jump */
 
   function jumpToSection(id) {
-    const target = document.getElementById(id);
     closePanel({ restoreFocus: false });
+    if (window.navigateToPage) {
+      window.navigateToPage(id);
+      return;
+    }
+    const target = document.getElementById(id);
     if (!target) return;
     target.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
     // Keyboard users continue from the section they jumped to.

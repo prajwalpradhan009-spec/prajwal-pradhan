@@ -73,6 +73,22 @@ app.use(express.json({ limit: '16kb' }));
 app.get('/', (request, response) => {
   response.sendFile(path.join(__dirname, '..', 'Frontend', 'public', 'index.html'));
 });
+const pageRoutes = [
+  '/home',
+  '/about',
+  '/learning',
+  '/education',
+  '/skills',
+  '/projects',
+  '/github',
+  '/services',
+  '/contact'
+];
+pageRoutes.forEach(route => {
+  app.get(route, (request, response) => {
+    response.sendFile(path.join(__dirname, '..', 'Frontend', 'public', 'index.html'));
+  });
+});
 app.get('/prajwal-pradhan', (request, response) => {
   response.sendFile(path.join(__dirname, '..', 'Frontend', 'prajwal-pradhan.html'));
 });

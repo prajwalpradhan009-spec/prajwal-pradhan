@@ -102,6 +102,11 @@
     }
   }
 
+  window.syncSkills = function() {
+    if (graph) graph.classList.add('is-ready');
+    syncCardGlow();
+  };
+
   syncCardGlow();
   finePointer.addEventListener('change', syncCardGlow);
   reduceMotion.addEventListener('change', () => {
