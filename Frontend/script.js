@@ -161,6 +161,8 @@ function animateCounts() {
         counter.textContent = target;
       } else {
         counter.textContent = value;
+      }
+      if (value < target) {
         requestAnimationFrame(tick);
       }
     };
@@ -183,55 +185,61 @@ const revealObserver = new IntersectionObserver(entries => {
 
 document.querySelectorAll('.reveal, .stats').forEach(el => revealObserver.observe(el));
 
-/* ------------------------------------------------- Multi-Page Router & Vertical Scroll */
+/* ------------------------------------------------- Navigation & Section Definitions */
 const PAGES = {
   home: {
-    id: 'page-home',
+    id: 'home',
     path: '/',
     title: 'Prajwal Pradhan | Full-Stack Developer',
     aliases: ['home', 'home.html', 'index', 'index.html']
   },
   about: {
-    id: 'page-about',
+    id: 'about',
     path: '/about',
     title: 'About | Prajwal Pradhan',
-    aliases: ['about', 'about.html']
+    aliases: ['about', 'about.html', 'stats']
   },
   learning: {
-    id: 'page-learning',
+    id: 'learning',
     path: '/learning',
     title: 'Learning | Prajwal Pradhan',
     aliases: ['learning', 'learning.html', 'education', 'education.html', '/education']
   },
   skills: {
-    id: 'page-skills',
+    id: 'skills',
     path: '/skills',
     title: 'Skills & Tech Stack | Prajwal Pradhan',
     aliases: ['skills', 'skills.html']
   },
   projects: {
-    id: 'page-projects',
+    id: 'projects',
     path: '/projects',
     title: 'Featured Projects | Prajwal Pradhan',
     aliases: ['projects', 'projects.html']
   },
   github: {
-    id: 'page-github',
+    id: 'github',
     path: '/github',
     title: 'GitHub Activity | Prajwal Pradhan',
     aliases: ['github', 'github.html']
   },
   services: {
-    id: 'page-services',
+    id: 'services',
     path: '/services',
     title: 'Services & Capabilities | Prajwal Pradhan',
     aliases: ['services', 'services.html']
   },
   contact: {
-    id: 'page-contact',
+    id: 'contact',
     path: '/contact',
     title: 'Contact | Prajwal Pradhan',
     aliases: ['contact', 'contact.html']
+  },
+  profile: {
+    id: 'profile',
+    path: '/profile',
+    title: 'Profile | Prajwal Pradhan',
+    aliases: ['profile', 'profile.html', 'prajwal-pradhan', 'prajwal-pradhan.html', '/prajwal-pradhan']
   }
 };
 
@@ -244,7 +252,7 @@ function resolvePageKey(input) {
     if (key === clean) return key;
     if (conf.aliases) {
       for (const alias of conf.aliases) {
-        const cleanAlias = alias.replace(/^\/+/, '').replace(/\/+$/, '');
+        const cleanAlias = alias.replace(/^\/+/, '').replace(/\/+$/, '').replace(/^#/, '');
         if (clean === cleanAlias) return key;
       }
     }
@@ -296,7 +304,8 @@ function animateScrollTo(targetY, onComplete) {
 function updateActiveNav(pageKey) {
   const allNavLinks = document.querySelectorAll('.nav-links a[data-nav], .nav-links a:not(.resume-link)');
   allNavLinks.forEach(link => {
-    const linkNav = link.dataset.nav || resolvePageKey(link.getAttribute('href'));
+    const href = link.getAttribute('href') || '';
+    const linkNav = link.dataset.nav || resolvePageKey(href);
     const isActive = linkNav === pageKey;
     link.classList.toggle('active', isActive);
   });
@@ -320,10 +329,11 @@ function setCurrentActiveSection(pageKey, updateUrl = true) {
   document.title = pageConf.title;
   updateActiveNav(pageKey);
 
-  document.querySelectorAll('.page-view').forEach(view => {
-    const isTarget = view.id === pageConf.id;
-    view.classList.toggle('active-page', isTarget);
-    view.classList.toggle('section-in-view', isTarget);
+  // Mark currently active section with .section-in-view to intensify bold & glowing color
+  const allSections = document.querySelectorAll('#home, #about, #learning, #skills, #projects, #github, #services, #contact, #profile');
+  allSections.forEach(section => {
+    const isTarget = section.id === pageConf.id;
+    section.classList.toggle('section-in-view', isTarget);
   });
 
   activateSectionFeatures(pageKey);
@@ -341,13 +351,13 @@ function setCurrentActiveSection(pageKey, updateUrl = true) {
 
 function scrollToPage(pageKey, pushHistory = true) {
   const pageConf = PAGES[pageKey] || PAGES.home;
-  const targetView = document.getElementById(pageConf.id);
-  if (!targetView) return;
+  const targetEl = document.getElementById(pageConf.id);
+  if (!targetEl) return;
 
   currentHeaderOffset = syncHeaderOffset();
   const targetY = pageKey === 'home'
     ? 0
-    : Math.max(0, Math.round(window.scrollY + targetView.getBoundingClientRect().top - (currentHeaderOffset + 18)));
+    : Math.max(0, Math.round(targetEl.getBoundingClientRect().top + window.scrollY - (currentHeaderOffset + 18)));
 
   setCurrentActiveSection(pageKey, false);
 
@@ -374,27 +384,29 @@ window.navigateToPage = function(key) {
 };
 
 /* ------------------------------------------------- Scroll Spy (Intersection Observer) */
-const pageViews = [...document.querySelectorAll('.page-view')];
-if (pageViews.length) {
+const SECTION_KEYS = ['home', 'about', 'learning', 'skills', 'projects', 'github', 'services', 'contact', 'profile'];
+const observedSections = SECTION_KEYS.map(id => document.getElementById(id)).filter(Boolean);
+
+if (observedSections.length) {
   const scrollSpyObserver = new IntersectionObserver(
     entries => {
       if (isProgrammaticScrolling) return;
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const key = resolvePageKey(entry.target.dataset.page || entry.target.id);
-          if (key) {
-            setCurrentActiveSection(key, true);
-          }
+      const visibleEntries = entries.filter(e => e.isIntersecting);
+      if (visibleEntries.length > 0) {
+        visibleEntries.sort((a, b) => Math.abs(a.boundingClientRect.top - 80) - Math.abs(b.boundingClientRect.top - 80));
+        const activeKey = visibleEntries[0].target.id;
+        if (activeKey) {
+          setCurrentActiveSection(activeKey, true);
         }
-      });
+      }
     },
     {
-      rootMargin: '-25% 0px -45% 0px',
-      threshold: [0, 0.2, 0.5]
+      rootMargin: '-20% 0px -40% 0px',
+      threshold: [0, 0.15, 0.4, 0.7]
     }
   );
 
-  pageViews.forEach(view => scrollSpyObserver.observe(view));
+  observedSections.forEach(section => scrollSpyObserver.observe(section));
 }
 
 // User scroll intervention interrupts programmatic scroll
@@ -408,7 +420,87 @@ for (const type of ['wheel', 'touchstart', 'pointerdown']) {
   }, { passive: true });
 }
 
-/* ------------------------------------------------- Mobile Menu & Click Routing */
+/* ------------------------------------------------- 3D Card Zoom & Entrance Observer */
+const cardEntranceObserver = new IntersectionObserver(
+  entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('card-in-view');
+      } else {
+        // Smoothly return cards to original appearance when scrolling away
+        entry.target.classList.remove('card-in-view');
+      }
+    });
+  },
+  {
+    rootMargin: '0px 0px -50px 0px',
+    threshold: 0.12
+  }
+);
+document.querySelectorAll('.card-3d-entrance').forEach(el => cardEntranceObserver.observe(el));
+
+/* ------------------------------------------------- Interactive 3D Card Cursor Tilt */
+function init3DCardTilt() {
+  if (reduceMotionQuery.matches) return;
+  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+
+  const tiltTargets = document.querySelectorAll(
+    '.card-3d, .sk-card, .project-showcase, .service, .timeline-item, .profile-card-3d, .code-window'
+  );
+
+  tiltTargets.forEach(card => {
+    let bounds;
+    let mouseX = 0;
+    let mouseY = 0;
+    let isHovering = false;
+    let rafId = null;
+
+    function updateTransform() {
+      if (!isHovering) return;
+      const x = (mouseX - bounds.left) / bounds.width - 0.5;
+      const y = (mouseY - bounds.top) / bounds.height - 0.5;
+      const rotX = (-y * 12).toFixed(2);
+      const rotY = (x * 12).toFixed(2);
+
+      card.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(12px) scale3d(1.02, 1.02, 1.02)`;
+      rafId = null;
+    }
+
+    card.addEventListener('pointerenter', () => {
+      isHovering = true;
+      bounds = card.getBoundingClientRect();
+      card.style.transition = 'none';
+      card.style.willChange = 'transform, box-shadow';
+    });
+
+    card.addEventListener('pointermove', e => {
+      if (!isHovering) return;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateTransform);
+      }
+    });
+
+    card.addEventListener('pointerleave', () => {
+      isHovering = false;
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+      card.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease';
+      card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale3d(1, 1, 1)';
+    });
+  });
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init3DCardTilt);
+} else {
+  init3DCardTilt();
+}
+
+/* ------------------------------------------------- Mobile Menu & Anchor Click Routing */
 menuToggle.addEventListener('click', () => {
   const isOpen = navLinks.classList.toggle('open');
   menuToggle.setAttribute('aria-expanded', isOpen);
@@ -426,9 +518,11 @@ document.addEventListener('click', event => {
   if (!href) return;
 
   if (href.startsWith('mailto:') || href.startsWith('tel:') || anchor.hasAttribute('download') || anchor.target === '_blank') return;
-  if (anchor.classList.contains('resume-link') || href.includes('prajwal-pradhan')) return;
+  if (anchor.classList.contains('resume-link')) return;
 
-  const pageKey = anchor.dataset.nav || resolvePageKey(href);
+  const rawKey = anchor.dataset.nav || (href.startsWith('#') ? href.slice(1) : href);
+  const pageKey = resolvePageKey(rawKey);
+
   if (pageKey && PAGES[pageKey]) {
     event.preventDefault();
     navLinks.classList.remove('open');
@@ -462,7 +556,7 @@ setCurrentActiveSection(initialPage, false);
 if (initialPage !== 'home') {
   setTimeout(() => {
     scrollToPage(initialPage, false);
-  }, 100);
+  }, 120);
 }
 
 /* ------------------------------------------------- Contact Form Handling */

@@ -82,7 +82,8 @@ const pageRoutes = [
   '/projects',
   '/github',
   '/services',
-  '/contact'
+  '/contact',
+  '/profile'
 ];
 pageRoutes.forEach(route => {
   app.get(route, (request, response) => {
