@@ -182,7 +182,7 @@ async function startServer() {
   // 3. Connect to MongoDB using the URI from your environment
   if (mongoUri) {
     try {
-      await mongoose.connect(mongoUri, { family: 4 });
+      await mongoose.connect(mongoUri, { family: 4, serverSelectionTimeoutMS: 5000 });
       isDatabaseConnected = true;
       console.log("Database Connected Successfully!");
     } catch (error) {

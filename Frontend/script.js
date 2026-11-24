@@ -97,23 +97,11 @@ function applyScrollState() {
   }
 }
 
-function markScrolling() {
-  document.documentElement.classList.add('is-scrolling');
-  clearTimeout(scrollIdleTimer);
-  scrollIdleTimer = setTimeout(() => {
-    document.documentElement.classList.remove('is-scrolling');
-  }, 180);
-}
-
 window.addEventListener('scroll', () => {
-  markScrolling();
   if (scrollFrameQueued) return;
   scrollFrameQueued = true;
   requestAnimationFrame(applyScrollState);
 }, { passive: true });
-
-window.addEventListener('touchstart', markScrolling, { passive: true });
-window.addEventListener('wheel', markScrolling, { passive: true });
 
 /* ------------------------------------------------- header height sync */
 const scrollRoot = document.documentElement;
@@ -263,42 +251,22 @@ function resolvePageKey(input) {
 let currentPage = null;
 let isProgrammaticScrolling = false;
 let scrollLockTimer = null;
-let scrollToken = 0;
 
-function easeInOutCubic(t) {
-  return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-}
-
-function animateScrollTo(targetY, onComplete) {
-  const startY = window.scrollY;
-  const distance = targetY - startY;
-  if (Math.abs(distance) < 2) {
-    if (onComplete) onComplete();
-    return;
-  }
-
+function smoothScrollTo(targetY) {
   isProgrammaticScrolling = true;
-  scrollRoot.classList.add('is-programmatic-scroll');
-  const token = ++scrollToken;
-  const duration = Math.min(850, Math.max(340, Math.abs(distance) * 0.45));
-  const startTime = performance.now();
+  clearTimeout(scrollLockTimer);
+  scrollLockTimer = setTimeout(() => {
+    isProgrammaticScrolling = false;
+  }, 750);
 
-  const step = now => {
-    if (token !== scrollToken) return;
-    const progress = Math.min((now - startTime) / duration, 1);
-    window.scrollTo(0, startY + distance * easeInOutCubic(progress));
-    if (progress < 1) {
-      requestAnimationFrame(step);
-    } else {
-      scrollRoot.classList.remove('is-programmatic-scroll');
-      clearTimeout(scrollLockTimer);
-      scrollLockTimer = setTimeout(() => {
-        isProgrammaticScrolling = false;
-      }, 100);
-      if (onComplete) onComplete();
-    }
-  };
-  requestAnimationFrame(step);
+  if (reduceMotionQuery.matches) {
+    window.scrollTo(0, targetY);
+  } else {
+    window.scrollTo({
+      top: targetY,
+      behavior: 'smooth'
+    });
+  }
 }
 
 function updateActiveNav(pageKey) {
@@ -371,11 +339,7 @@ function scrollToPage(pageKey, pushHistory = true) {
     }
   }
 
-  if (reduceMotionQuery.matches) {
-    window.scrollTo(0, targetY);
-  } else {
-    animateScrollTo(targetY);
-  }
+  smoothScrollTo(targetY);
 }
 
 window.navigateToPage = function(key) {
@@ -391,32 +355,28 @@ if (observedSections.length) {
   const scrollSpyObserver = new IntersectionObserver(
     entries => {
       if (isProgrammaticScrolling) return;
-      const visibleEntries = entries.filter(e => e.isIntersecting);
-      if (visibleEntries.length > 0) {
-        visibleEntries.sort((a, b) => Math.abs(a.boundingClientRect.top - 80) - Math.abs(b.boundingClientRect.top - 80));
-        const activeKey = visibleEntries[0].target.id;
-        if (activeKey) {
-          setCurrentActiveSection(activeKey, true);
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const activeKey = entry.target.id;
+          if (activeKey) {
+            setCurrentActiveSection(activeKey, true);
+          }
         }
-      }
+      });
     },
     {
-      rootMargin: '-20% 0px -40% 0px',
-      threshold: [0, 0.15, 0.4, 0.7]
+      rootMargin: '-20% 0px -55% 0px',
+      threshold: 0
     }
   );
 
   observedSections.forEach(section => scrollSpyObserver.observe(section));
 }
 
-// User scroll intervention interrupts programmatic scroll
+// User scroll intervention releases programmatic scroll lock
 for (const type of ['wheel', 'touchstart', 'pointerdown']) {
   window.addEventListener(type, () => {
-    if (scrollRoot.classList.contains('is-programmatic-scroll')) {
-      scrollToken++;
-      scrollRoot.classList.remove('is-programmatic-scroll');
-      isProgrammaticScrolling = false;
-    }
+    isProgrammaticScrolling = false;
   }, { passive: true });
 }
 

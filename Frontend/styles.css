@@ -45,19 +45,8 @@
 }
 html {
   scroll-behavior: smooth;
-  /* The header is fixed, so without this every in-page jump parks the section
-     heading underneath it. script.js keeps --header-offset in sync with the
-     real header height; the fallback covers the moment before it runs and any
-     load where scripting is unavailable. */
   scroll-padding-top: calc(var(--header-offset, 76px) + 14px);
   -webkit-tap-highlight-color: transparent;
-}
-/* A scripted scroll drives window.scrollTo on every frame. Leaving the native
-   smooth behaviour enabled would make the browser animate each of those
-   individual steps too, so the scroll position lags behind the easing curve.
-   The class is added for the duration of the animation only. */
-html.is-programmatic-scroll {
-  scroll-behavior: auto !important;
 }
 a,
 button,
@@ -3847,49 +3836,6 @@ html[data-theme="dark"] .skill-caption {
     animation: none;
   }
 }
-
-/* ---------------------------------------------------------------------------
-   Scroll performance
-   ---------------------------------------------------------------------------
-   Scrolling on a phone was visibly stuttery. The page runs a large number of
-   looping decorative animations and several blurred surfaces, both of which
-   compete for the frames that scrolling needs. The rules below only change
-   behaviour while the page is actually moving, so the design is untouched when
-   the page is at rest.
-*/
-
-/* While scrolling, hand the frames to the scroll itself. `is-scrolling` is
-   added by script.js on the first scroll/touch/wheel event and removed once
-   movement stops. Pausing an animation mid-flight freezes its current frame,
-   so nothing visibly jumps when it resumes. */
-.is-scrolling *,
-.is-scrolling *::before,
-.is-scrolling *::after {
-  animation-play-state: paused !important;
-}
-
-/* Tell the browser to leave off-screen sections alone. It skips their layout,
-   paint and the animations inside them until they are close to the viewport.
-   `contain-intrinsic-size` supplies a placeholder height so the scrollbar
-   length stays stable and does not jump while you are dragging it. */
-main section[id] {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 900px;
-}
-
-/* Per-section placeholder heights, measured at a 390px-wide viewport. Using one
-   flat number for every section would make the scrollbar grow or shrink as each
-   section first comes into view, which moves the content under the visitor's
-   finger. `auto` means the real height is remembered once a section has been
-   rendered, so this only affects the first pass through the page. */
-#home { contain-intrinsic-size: auto 1139px; }
-#about { contain-intrinsic-size: auto 1338px; }
-#education { contain-intrinsic-size: auto 1147px; }
-#skills { contain-intrinsic-size: auto 2240px; }
-#projects { contain-intrinsic-size: auto 1891px; }
-#github { contain-intrinsic-size: auto 2637px; }
-#services { contain-intrinsic-size: auto 1351px; }
-#contact { contain-intrinsic-size: auto 994px; }
 
 /* On touch devices and narrow screens the frosted-glass surfaces are the single
    most expensive thing on the page: every blurred pixel has to be recomputed as
