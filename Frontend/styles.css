@@ -3281,21 +3281,25 @@ html[data-theme="dark"] .skill-caption {
 }
 
 /* ============================================================
-   04 · Selected work — featured project showcase
+   04 · Selected work — Vertical featured project showcase
    ============================================================ */
 .projects-showcase {
   display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 40px;
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
 }
 .project-showcase {
   position: relative;
   isolation: isolate;
-  display: grid;
-  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
   border: 1px solid color-mix(in srgb, var(--mint) 24%, transparent);
-  border-radius: 24px;
-  background: color-mix(in srgb, var(--panel) 74%, transparent);
+  border-radius: 26px;
+  background: color-mix(in srgb, var(--panel) 78%, transparent);
   -webkit-backdrop-filter: blur(16px);
   backdrop-filter: blur(16px);
   overflow: hidden;
@@ -3308,15 +3312,15 @@ html[data-theme="dark"] .skill-caption {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background: radial-gradient(120% 90% at 12% 0%, color-mix(in srgb, var(--mint) 16%, transparent), transparent 58%);
+  background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--mint) 18%, transparent), transparent 64%);
   opacity: 0.7;
   transition: opacity 0.4s ease;
   pointer-events: none;
 }
 .project-showcase:hover {
   transform: translateY(-8px);
-  border-color: color-mix(in srgb, var(--mint) 52%, transparent);
-  box-shadow: 0 34px 70px -32px color-mix(in srgb, var(--mint) 65%, transparent), 0 0 0 1px color-mix(in srgb, var(--mint) 12%, transparent) inset;
+  border-color: color-mix(in srgb, var(--mint) 54%, transparent);
+  box-shadow: 0 34px 70px -32px color-mix(in srgb, var(--mint) 65%, transparent), 0 0 0 1px color-mix(in srgb, var(--mint) 16%, transparent) inset;
 }
 .project-showcase:hover::before {
   opacity: 1;
@@ -3326,58 +3330,59 @@ html[data-theme="dark"] .skill-caption {
   content: "";
   position: absolute;
   top: 0;
-  left: 12%;
-  right: 12%;
+  left: 8%;
+  right: 8%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--mint) 70%, transparent), transparent);
-  opacity: 0.55;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--mint) 75%, transparent), transparent);
+  opacity: 0.6;
   pointer-events: none;
 }
 
-/* ---------- preview media ---------- */
+/* ---------- preview media (top banner) ---------- */
 .project-media {
   position: relative;
   overflow: hidden;
-  min-height: 300px;
-  display: grid;
-  place-items: center;
-  padding: 40px 30px;
-  background: radial-gradient(circle at 32% 18%, rgba(8, 174, 196, 0.22), transparent 58%), linear-gradient(145deg, #061219, #0c2530 58%, #08171f);
+  width: 100%;
+  height: 330px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 34px;
+  background: radial-gradient(circle at 50% 50%, rgba(8, 174, 196, 0.22), transparent 70%), linear-gradient(150deg, #05131b, #0c2530 60%, #07161f);
+  border-bottom: 1px solid color-mix(in srgb, var(--mint) 16%, transparent);
 }
 /* Subtle grid, so the artwork reads like a product screenshot. */
 .project-media-grid {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(rgba(105, 229, 225, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(105, 229, 225, 0.07) 1px, transparent 1px);
-  background-size: 34px 34px;
-  mask-image: radial-gradient(75% 75% at 50% 45%, #000, transparent 78%);
-  -webkit-mask-image: radial-gradient(75% 75% at 50% 45%, #000, transparent 78%);
+  background-image: linear-gradient(rgba(105, 229, 225, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(105, 229, 225, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(75% 75% at 50% 50%, #000, transparent 80%);
+  -webkit-mask-image: radial-gradient(75% 75% at 50% 50%, #000, transparent 80%);
   pointer-events: none;
 }
 .project-media img {
-  position: absolute;
-  inset: 0;
+  position: relative;
   z-index: 1;
-  /* Full-bleed: the artwork fills the panel edge to edge with no gaps, and
-     object-fit crops rather than letterboxes. Absolute positioning keeps the
-     fill exact at any panel height, including the stacked mobile layout. */
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-width: 80%;
+  max-height: 220px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
   object-position: center;
   transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.65));
 }
 .project-media-logo img {
-  object-fit: contain;
-  padding: 18px;
-  background: radial-gradient(circle at 50% 45%, rgba(13, 96, 145, 0.24), transparent 68%);
+  max-height: 200px;
+  padding: 10px;
 }
 .project-showcase:hover .project-media img {
-  transform: scale(1.07);
+  transform: scale(1.06);
 }
 .project-flag {
   position: absolute;
-  top: 20px;
+  top: 18px;
   left: 20px;
   z-index: 2;
   font: 500 10px var(--mono);
@@ -3385,18 +3390,51 @@ html[data-theme="dark"] .skill-caption {
   text-transform: uppercase;
   color: #04161a;
   background: linear-gradient(135deg, #7ff0ea, #34c6d4);
-  padding: 7px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
   box-shadow: 0 0 22px rgba(8, 174, 196, 0.45);
 }
 
-/* ---------- copy ---------- */
+/* ---------- continuous sideways animated ticker ribbon ---------- */
+.project-ticker {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--mint) 14%, var(--line));
+  padding: 9px 0;
+  user-select: none;
+  pointer-events: none;
+}
+.project-ticker-track {
+  display: flex;
+  white-space: nowrap;
+  width: max-content;
+  animation: sidewayTextScroll 22s linear infinite;
+}
+.project-ticker-track span {
+  font: 500 11px var(--mono);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--mint) 85%, transparent);
+  padding-right: 28px;
+}
+@keyframes sidewayTextScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- copy (vertical bottom section) ---------- */
 .project-body {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 16px;
-  padding: 40px 42px;
+  justify-content: flex-start;
+  gap: 18px;
+  padding: 36px 42px 42px;
 }
 .project-head {
   display: flex;
@@ -3408,14 +3446,14 @@ html[data-theme="dark"] .skill-caption {
   font: 500 13px var(--mono);
   letter-spacing: 0.12em;
   color: var(--mint);
-  padding: 5px 10px;
+  padding: 5px 11px;
   border: 1px solid color-mix(in srgb, var(--mint) 34%, transparent);
   border-radius: 8px;
   background: color-mix(in srgb, var(--mint) 10%, transparent);
 }
 .project-category {
   position: relative;
-  font: 10px var(--mono);
+  font: 11px var(--mono);
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted);
@@ -3433,17 +3471,70 @@ html[data-theme="dark"] .skill-caption {
   background: var(--mint);
   box-shadow: 0 0 10px color-mix(in srgb, var(--mint) 70%, transparent);
 }
+
+/* Sideway text shimmer on project heading */
 .project-body h3 {
-  font-size: 30px;
-  letter-spacing: -0.04em;
+  font-size: 32px;
+  letter-spacing: -0.03em;
   margin: 0;
-  line-height: 1.15;
+  line-height: 1.2;
+  background: linear-gradient(90deg, #ffffff 0%, #ffffff 45%, var(--mint) 75%, #ffffff 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: background-position 0.6s ease;
+}
+.project-showcase:hover .project-body h3 {
+  background-position: -100% center;
 }
 .project-body > p {
   margin: 0;
   color: var(--muted);
-  max-width: 52ch;
+  max-width: 65ch;
   line-height: 1.72;
+  font-size: 15.5px;
+}
+
+/* ---------- Sideway Text Entrance Animation ---------- */
+.project-showcase .project-head,
+.project-showcase .project-body h3,
+.project-showcase .project-body > p,
+.project-showcase .project-stack,
+.project-showcase .project-links {
+  opacity: 0.3;
+  transform: translateX(-32px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.project-showcase.visible .project-head,
+.project-showcase.card-in-view .project-head {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.06s;
+}
+.project-showcase.visible .project-body h3,
+.project-showcase.card-in-view .project-body h3 {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.14s;
+}
+.project-showcase.visible .project-body > p,
+.project-showcase.card-in-view .project-body > p {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.22s;
+}
+.project-showcase.visible .project-stack,
+.project-showcase.card-in-view .project-stack {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.30s;
+}
+.project-showcase.visible .project-links,
+.project-showcase.card-in-view .project-links {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.38s;
 }
 
 /* ---------- tech badges ---------- */
@@ -3460,12 +3551,13 @@ html[data-theme="dark"] .skill-caption {
   color: var(--muted);
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--panel-2) 60%, transparent);
-  padding: 6px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   transition: color 0.25s ease, border-color 0.25s ease;
 }
 .project-showcase:hover .project-stack li {
-  border-color: color-mix(in srgb, var(--mint) 30%, var(--line));
+  border-color: color-mix(in srgb, var(--mint) 34%, var(--line));
+  color: var(--fg);
 }
 
 /* ---------- buttons ---------- */
@@ -3473,7 +3565,7 @@ html[data-theme="dark"] .skill-caption {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 4px;
+  margin-top: 6px;
 }
 .project-btn {
   display: inline-flex;
@@ -3486,7 +3578,7 @@ html[data-theme="dark"] .skill-caption {
   color: var(--text);
   border: 1px solid color-mix(in srgb, var(--mint) 34%, transparent);
   background: color-mix(in srgb, var(--panel-2) 70%, transparent);
-  padding: 12px 18px;
+  padding: 12px 20px;
   border-radius: 999px;
   transition: transform 0.3s ease, border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
 }
@@ -3500,10 +3592,6 @@ html[data-theme="dark"] .skill-caption {
   color: var(--mint);
   box-shadow: 0 10px 26px -14px color-mix(in srgb, var(--mint) 80%, transparent);
 }
-.project-btn-demo:hover {
-  color: var(--mint);
-}
-/* Live demo link is intentionally inert until a deployed URL is pasted in. */
 .project-btn.is-pending {
   color: var(--muted);
   border-style: dashed;
@@ -3520,7 +3608,7 @@ html[data-theme="dark"] .skill-caption {
 
 /* ---------- closing call to action ---------- */
 .projects-more {
-  margin-top: 30px;
+  margin-top: 36px;
   padding: 44px 32px;
   text-align: center;
   border: 1px dashed color-mix(in srgb, var(--mint) 32%, transparent);
@@ -3528,6 +3616,10 @@ html[data-theme="dark"] .skill-caption {
   background: color-mix(in srgb, var(--panel) 60%, transparent);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
+  max-width: 860px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
   transition: border-color 0.35s ease, transform 0.35s ease;
 }
 .projects-more:hover {
@@ -3544,58 +3636,39 @@ html[data-theme="dark"] .skill-caption {
   color: var(--muted);
 }
 
-/* ---------- featured card is the larger one ---------- */
+/* Individual card refinements */
 .project-showcase-featured {
-  grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr);
   border-color: color-mix(in srgb, var(--mint) 38%, transparent);
   box-shadow: 0 26px 60px -34px color-mix(in srgb, var(--mint) 70%, transparent);
 }
-.project-showcase-featured .project-media {
-  min-height: 380px;
-  padding: 44px 34px;
-}
-.project-showcase-featured .project-body h3 {
-  font-size: 38px;
-}
-.project-showcase-featured .project-body {
-  padding: 48px 46px;
-}
-
-.project-showcase-secondary {
-  grid-template-columns: minmax(0, 0.86fr) minmax(0, 1fr);
-}
 .project-showcase-secondary .project-media {
-  min-height: 300px;
-  padding: 40px 30px;
-}
-.project-showcase-secondary .project-body h3 {
-  font-size: 27px;
+  height: 290px;
 }
 
 @media (max-width: 980px) {
-  .project-showcase,
-  .project-showcase-featured {
-    grid-template-columns: 1fr;
-  }
   .services-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .service:last-child {
     grid-column: 1 / -1;
   }
+}
+
+@media (max-width: 850px) {
   .project-media,
-  .project-showcase-featured .project-media,
   .project-showcase-secondary .project-media {
-    min-height: 280px;
-    padding: 44px 34px;
+    height: 250px;
+    padding: 24px;
   }
-  .project-body,
-  .project-showcase-featured .project-body {
-    padding: 30px 28px 34px;
+  .project-media img {
+    max-height: 170px;
+  }
+  .project-body {
+    padding: 28px 24px 32px;
     gap: 14px;
   }
-  .project-showcase-featured .project-body h3 {
-    font-size: 30px;
+  .project-body h3 {
+    font-size: 26px;
   }
 }
 @media (max-width: 560px) {
