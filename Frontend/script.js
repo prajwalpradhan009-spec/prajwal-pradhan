@@ -1,4 +1,4 @@
-lucide.createIcons();
+window.lucide?.createIcons();
 
 const termBody = document.getElementById('termBody');
 if (termBody) {
@@ -55,7 +55,7 @@ function updateThemeToggle() {
   themeToggle.setAttribute('aria-pressed', isDark);
   themeToggle.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
   themeToggle.innerHTML = `<i data-lucide="${isDark ? 'sun' : 'moon'}"></i><span>${isDark ? 'Light' : 'Dark'}</span>`;
-  lucide.createIcons();
+  window.lucide?.createIcons();
 }
 updateThemeToggle();
 themeToggle.addEventListener('click', () => {
@@ -69,59 +69,6 @@ const header = document.querySelector('.site-header');
 const menuToggle = document.querySelector('.menu-toggle');
 const navLinks = document.querySelector('.nav-links');
 const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-const trackScrollProgress = window.matchMedia('(min-width: 851px) and (hover: hover) and (pointer: fine)');
-
-if (!reduceMotionQuery.matches && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-  document.querySelectorAll('.button-primary:not(:disabled)').forEach((button) => {
-    const resetMagneticOffset = () => {
-      button.style.setProperty('--magnetic-x', '0px');
-      button.style.setProperty('--magnetic-y', '0px');
-    };
-
-    button.addEventListener('pointermove', (event) => {
-      const bounds = button.getBoundingClientRect();
-      const offsetX = (event.clientX - bounds.left - bounds.width / 2) / bounds.width;
-      const offsetY = (event.clientY - bounds.top - bounds.height / 2) / bounds.height;
-      button.style.setProperty('--magnetic-x', `${offsetX * 5}px`);
-      button.style.setProperty('--magnetic-y', `${offsetY * 4}px`);
-    });
-    button.addEventListener('pointerleave', resetMagneticOffset);
-    button.addEventListener('blur', resetMagneticOffset);
-  });
-}
-
-let scrollFrameQueued = false;
-let lastScrollProgress = -1;
-let lastHeaderScrolled = null;
-let scrollIdleTimer = null;
-
-function applyScrollState() {
-  scrollFrameQueued = false;
-  const y = window.scrollY;
-
-  const isScrolled = y > 20;
-  if (isScrolled !== lastHeaderScrolled) {
-    header.classList.toggle('scrolled', isScrolled);
-    lastHeaderScrolled = isScrolled;
-  }
-
-  if (!trackScrollProgress.matches) return;
-
-  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-  const progress = maxScroll > 0 ? Math.min(100, (y / maxScroll) * 100) : 0;
-  const roundedProgress = Math.round(progress * 10) / 10;
-  if (roundedProgress !== lastScrollProgress) {
-    document.documentElement.style.setProperty('--scroll-progress', String(roundedProgress / 100));
-    lastScrollProgress = roundedProgress;
-  }
-}
-
-window.addEventListener('scroll', () => {
-  if (scrollFrameQueued) return;
-  scrollFrameQueued = true;
-  requestAnimationFrame(applyScrollState);
-}, { passive: true });
-
 /* ------------------------------------------------- header height sync */
 const scrollRoot = document.documentElement;
 function syncHeaderOffset() {
@@ -188,7 +135,7 @@ const revealObserver = new IntersectionObserver(entries => {
     }
     revealObserver.unobserve(entry.target);
   });
-}, { threshold: 0.12 });
+}, { threshold: 0 });
 
 document.querySelectorAll('.reveal, .stats').forEach(el => revealObserver.observe(el));
 
@@ -271,15 +218,15 @@ let currentPage = null;
 let isProgrammaticScrolling = false;
 let scrollLockTimer = null;
 
-function smoothScrollTo(targetY) {
+function smoothScrollTo(targetY, instant) {
   isProgrammaticScrolling = true;
   clearTimeout(scrollLockTimer);
   scrollLockTimer = setTimeout(() => {
     isProgrammaticScrolling = false;
   }, 750);
 
-  if (reduceMotionQuery.matches) {
-    window.scrollTo(0, targetY);
+  if (instant || reduceMotionQuery.matches) {
+    window.scrollTo({ top: targetY, behavior: 'instant' });
   } else {
     window.scrollTo({
       top: targetY,
@@ -295,6 +242,8 @@ function updateActiveNav(pageKey) {
     const linkNav = link.dataset.nav || resolvePageKey(href);
     const isActive = linkNav === pageKey;
     link.classList.toggle('active', isActive);
+    if (isActive) link.setAttribute('aria-current', 'location');
+    else link.removeAttribute('aria-current');
   });
 }
 
@@ -316,7 +265,6 @@ function setCurrentActiveSection(pageKey, updateUrl = true) {
   document.title = pageConf.title;
   updateActiveNav(pageKey);
 
-  // Mark currently active section with .section-in-view to intensify bold & glowing color
   const allSections = document.querySelectorAll('#home, #about, #learning, #skills, #projects, #github, #services, #contact, #profile');
   allSections.forEach(section => {
     const isTarget = section.id === pageConf.id;
@@ -336,15 +284,16 @@ function setCurrentActiveSection(pageKey, updateUrl = true) {
   }
 }
 
-function scrollToPage(pageKey, pushHistory = true) {
+function scrollToPage(pageKey, pushHistory = true, instant = false) {
   const pageConf = PAGES[pageKey] || PAGES.home;
   const targetEl = document.getElementById(pageConf.id);
   if (!targetEl) return;
 
   currentHeaderOffset = syncHeaderOffset();
+  const heading = targetEl.querySelector('.section-heading, .contact-copy') || targetEl;
   const targetY = pageKey === 'home'
     ? 0
-    : Math.max(0, Math.round(targetEl.getBoundingClientRect().top + window.scrollY - (currentHeaderOffset + 18)));
+    : Math.max(0, Math.round(heading.getBoundingClientRect().top + window.scrollY - currentHeaderOffset - 24));
 
   setCurrentActiveSection(pageKey, false);
 
@@ -358,7 +307,7 @@ function scrollToPage(pageKey, pushHistory = true) {
     }
   }
 
-  smoothScrollTo(targetY);
+  smoothScrollTo(targetY, instant);
 }
 
 window.navigateToPage = function(key) {
@@ -399,92 +348,11 @@ for (const type of ['wheel', 'touchstart', 'pointerdown']) {
   }, { passive: true });
 }
 
-/* ------------------------------------------------- 3D Card Zoom & Entrance Observer */
-const cardEntranceObserver = new IntersectionObserver(
-  entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('card-in-view');
-      } else {
-        // Smoothly return cards to original appearance when scrolling away
-        entry.target.classList.remove('card-in-view');
-      }
-    });
-  },
-  {
-    rootMargin: '0px 0px -50px 0px',
-    threshold: 0.12
-  }
-);
-document.querySelectorAll('.card-3d-entrance').forEach(el => cardEntranceObserver.observe(el));
-
-/* ------------------------------------------------- Interactive 3D Card Cursor Tilt */
-function init3DCardTilt() {
-  if (reduceMotionQuery.matches) return;
-  if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-
-  const tiltTargets = document.querySelectorAll(
-    '.card-3d, .sk-card, .project-showcase, .service, .timeline-item, .profile-card-3d, .code-window'
-  );
-
-  tiltTargets.forEach(card => {
-    let bounds;
-    let mouseX = 0;
-    let mouseY = 0;
-    let isHovering = false;
-    let rafId = null;
-
-    function updateTransform() {
-      if (!isHovering) return;
-      const x = (mouseX - bounds.left) / bounds.width - 0.5;
-      const y = (mouseY - bounds.top) / bounds.height - 0.5;
-      const rotX = (-y * 12).toFixed(2);
-      const rotY = (x * 12).toFixed(2);
-
-      card.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(12px) scale3d(1.02, 1.02, 1.02)`;
-      rafId = null;
-    }
-
-    card.addEventListener('pointerenter', () => {
-      isHovering = true;
-      bounds = card.getBoundingClientRect();
-      card.style.transition = 'none';
-      card.style.willChange = 'transform, box-shadow';
-    });
-
-    card.addEventListener('pointermove', e => {
-      if (!isHovering) return;
-      mouseX = e.clientX;
-      mouseY = e.clientY;
-      if (!rafId) {
-        rafId = requestAnimationFrame(updateTransform);
-      }
-    });
-
-    card.addEventListener('pointerleave', () => {
-      isHovering = false;
-      if (rafId) {
-        cancelAnimationFrame(rafId);
-        rafId = null;
-      }
-      card.style.transition = 'transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease';
-      card.style.transform = 'perspective(1200px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale3d(1, 1, 1)';
-    });
-  });
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init3DCardTilt);
-} else {
-  init3DCardTilt();
-}
-
 /* ------------------------------------------------- Mobile Menu & Anchor Click Routing */
 menuToggle.addEventListener('click', () => {
   const isOpen = navLinks.classList.toggle('open');
   menuToggle.setAttribute('aria-expanded', isOpen);
-  menuToggle.innerHTML = `<i data-lucide="${isOpen ? 'x' : 'menu'}"></i>`;
-  lucide.createIcons();
+  menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation' : 'Open navigation');
 });
 
 document.addEventListener('click', event => {
@@ -506,8 +374,7 @@ document.addEventListener('click', event => {
     event.preventDefault();
     navLinks.classList.remove('open');
     menuToggle.setAttribute('aria-expanded', 'false');
-    menuToggle.innerHTML = '<i data-lucide="menu"></i>';
-    lucide.createIcons();
+    menuToggle.setAttribute('aria-label', 'Open navigation');
 
     scrollToPage(pageKey, true);
   }
@@ -533,9 +400,13 @@ const initialPage = getInitialPage();
 setCurrentActiveSection(initialPage, false);
 
 if (initialPage !== 'home') {
-  setTimeout(() => {
-    scrollToPage(initialPage, false);
-  }, 120);
+  scrollToPage(initialPage, false, true);
+  // Fonts and images above a direct link can change its final scroll position.
+  const alignAfterLoad = () => {
+    if (currentPage === initialPage && isProgrammaticScrolling) scrollToPage(initialPage, false, true);
+  };
+  document.fonts.ready.then(alignAfterLoad);
+  window.addEventListener('load', alignAfterLoad, { once: true });
 }
 
 /* ------------------------------------------------- Contact Form Handling */

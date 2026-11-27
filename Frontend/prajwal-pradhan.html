@@ -11,59 +11,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,600;1,700;1,800;1,900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/portfolio-theme.css" />
-  <style>
-    .profile-page {
-      min-height: 100vh;
-      padding-top: 150px;
-      padding-bottom: 80px;
-    }
-    .profile-copy {
-      max-width: 760px;
-    }
-    .profile-label {
-      color: var(--mint);
-      font: 12px var(--mono);
-      text-transform: uppercase;
-    }
-    .profile-copy h1 {
-      margin: 18px 0 10px;
-      font-size: 48px;
-      line-height: 1.12;
-    }
-    .profile-role {
-      color: var(--mint);
-      font-size: 18px;
-    }
-    .profile-description {
-      max-width: 640px;
-      margin: 26px 0 32px;
-      color: var(--muted);
-      font-size: 16px;
-    }
-    .profile-links {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .profile-home {
-      margin-top: 56px;
-      color: var(--muted);
-      font: 12px var(--mono);
-    }
-    .profile-home a {
-      color: var(--text);
-      text-decoration: underline;
-      text-decoration-color: var(--mint);
-      text-underline-offset: 4px;
-    }
-    @media (max-width: 600px) {
-      .profile-page { padding-top: 120px; }
-      .profile-copy h1 { font-size: 36px; }
-      .profile-role { font-size: 16px; }
-    }
-  </style>
+  <link rel="stylesheet" href="/styles.css" />
+  <script>if (localStorage.getItem("portfolio-theme") === "dark") document.documentElement.dataset.theme = "dark";</script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",

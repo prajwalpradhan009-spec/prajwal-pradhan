@@ -10,19 +10,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@1,600;1,700;1,800;1,900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portfolio-theme.css" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="github.css" />
   <link rel="stylesheet" href="chat.css" />
   <link rel="stylesheet" href="skills.css" />
-  <link rel="stylesheet" href="portfolio-theme.css" />
 </head>
 <body>
-  <div class="page-noise"></div>
   <header class="site-header" id="top">
     <nav class="nav container" aria-label="Main navigation">
       <a class="brand" href="#home" aria-label="Prajjwal Pradhan home"><span class="brand-logo"><img src="profile.png" alt="" onerror="this.style.display='none'" /></span><span class="brand-name">Prajwal Pradhan</span></a>
-      <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false"><i data-lucide="menu"></i></button>
-      <div class="nav-links">
+      <button class="menu-toggle" type="button" aria-label="Open navigation" aria-controls="primary-links" aria-expanded="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path class="menu-bars" d="M3 6h18M3 12h18M3 18h18"/><path class="menu-cross" d="m5 5 14 14M19 5 5 19"/></svg></button>
+      <div class="nav-links" id="primary-links">
         <a class="active" href="#home" data-nav="home">Home</a>
         <a href="#about" data-nav="about">About</a>
         <a href="#learning" data-nav="learning">Learning</a>
@@ -41,12 +40,6 @@
   <main id="main-content">
     <!-- 1. Hero Section -->
     <section class="hero-section" id="home">
-      <div class="hero-bg" aria-hidden="true"></div>
-      <div class="hero-overlay" aria-hidden="true"></div>
-      <div class="hero-particles" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-      </div>
-      <div class="hero-glow-beam" aria-hidden="true"></div>
       <div class="hero container">
         <div class="hero-copy">
           <p class="eyebrow"><span class="availability-dot" aria-hidden="true"></span>Available for opportunities</p>
@@ -85,11 +78,11 @@
     </section>
 
     <!-- Quick Stats -->
-    <section class="stats container reveal card-3d-entrance" id="stats" aria-label="Quick facts">
-      <div class="card-3d"><strong data-count="2">0</strong><span>Years learning</span></div>
-      <div class="card-3d"><strong data-count="2">0</strong><span>Projects built</span></div>
-      <div class="card-3d"><strong data-count="5">0</strong><span>Technologies</span></div>
-      <div class="card-3d"><strong data-count="2">0</strong><span>Certifications</span></div>
+    <section class="stats container reveal" id="stats" aria-label="Quick facts">
+      <div><strong data-count="2">0</strong><span>Years learning</span></div>
+      <div><strong data-count="2">0</strong><span>Projects built</span></div>
+      <div><strong data-count="5">0</strong><span>Technologies</span></div>
+      <div><strong data-count="2">0</strong><span>Certifications</span></div>
     </section>
 
     <!-- 2. About Section -->
@@ -97,13 +90,13 @@
       <div class="section-heading split-heading reveal">
         <div>
           <p class="eyebrow">01 / About me</p>
-          <h2>A developer with<br /><em>a builder&rsquo;s mind.</em></h2>
+          <h2>A developer with <em>a builder&rsquo;s mind.</em></h2>
         </div>
-        <p class="heading-note">Curious by nature.<br />Focused on building useful things.</p>
+        <p class="heading-note">Curious by nature.<br /> Focused on building useful things.</p>
       </div>
 
       <div class="about-showcase reveal">
-        <div class="about-photo-wrap card-3d">
+        <div class="about-photo-wrap">
           <img class="about-photo" src="img.png" alt="Prajjwal Pradhan working at his computer" loading="lazy" />
           <span class="about-photo-caption">BUILD&nbsp; / &nbsp;LEARN&nbsp; / &nbsp;CREATE</span>
         </div>
@@ -126,32 +119,43 @@
       <div class="section-heading split-heading reveal">
         <div>
           <p class="eyebrow">02 / The path so far</p>
-          <h2>Learning in<br /><em>public.</em></h2>
+          <h2>Learning in <em>public.</em></h2>
         </div>
-        <p class="heading-note">Every chapter adds a new<br />way of seeing the problem.</p>
+        <p class="heading-note">Every chapter adds a new<br /> way of seeing the problem.</p>
       </div>
       <div class="timeline">
-        <article class="timeline-item reveal card-3d card-3d-entrance">
-          <span class="timeline-dot"></span>
-          <div class="timeline-meta"><i data-lucide="graduation-cap"></i>2025 — Present <span>Current</span></div>
-          <h3>Sikkim Alpine University</h3>
-          <small class="timeline-desc">Focused on learning web development end to end — HTML, CSS and JavaScript for the frontend, Node.js, Express and databases for the backend.<br />Currently exploring Python, web Tecnologies, API design and deployment so I can build full products on my own.<br />Every project teaches me something new — responsive layouts, clean architecture, debugging and shipping.<br />I learn by building: small experiments, real tools and a lot of curiosity.<br />Right now I'm going deeper into Python, Node.js and understanding how the web really works.</small>
-          <div class="timeline-tags"><span>Web Development</span><span>Python</span><span>Node.js</span></div>
+        <article class="timeline-item reveal">
+          <span class="timeline-marker" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m2 10 10-5 10 5-10 5-10-5Z"/><path d="M6 12v5c4 3 8 3 12 0v-5M22 10v6"/></svg></span>
+          <div class="timeline-meta">2025 — Present<span>Current</span></div>
+          <div class="timeline-card">
+            <h3>Sikkim Alpine University</h3>
+            <div class="timeline-desc">
+              <p>Focused on learning web development end to end — HTML, CSS and JavaScript for the frontend, Node.js, Express and databases for the backend.</p>
+              <p>Currently exploring Python, web Tecnologies, API design and deployment so I can build full products on my own.</p>
+              <p>Every project teaches me something new — responsive layouts, clean architecture, debugging and shipping.</p>
+              <p>I learn by building: small experiments, real tools and a lot of curiosity.</p>
+              <p>Right now I'm going deeper into Python, Node.js and understanding how the web really works.</p>
+            </div>
+            <div class="timeline-tags"><span>Web Development</span><span>Python</span><span>Node.js</span></div>
+          </div>
         </article>
-        <article class="timeline-item reveal reveal-delay card-3d card-3d-entrance">
-          <span class="timeline-dot"></span>
-          <div class="timeline-meta"><i data-lucide="school"></i>Completed 2025</div>
-          <h3>Government Senior Secondary School, Rhenock</h3>
-          <p class="timeline-deg">Higher Secondary</p>
-          <small class="timeline-desc">Where the curiosity began: a first spark for technology, problem-solving and making things from scratch — taking machines apart, exploring how software works and writing a very first lines of code.</small>
-          <div class="timeline-tags"><span>Information Technology</span><span>Mathematics</span><span>DBMS</span><span>First Code</span></div>
+        <article class="timeline-item reveal reveal-delay">
+          <span class="timeline-marker" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 9-8 9 8M5 10v11h14V10M10 21v-6h4v6"/><circle cx="12" cy="10" r="1"/></svg></span>
+          <div class="timeline-meta">Completed 2025</div>
+          <div class="timeline-card">
+            <h3>Government Senior Secondary School, Rhenock</h3>
+            <p class="timeline-deg">Higher Secondary</p>
+            <div class="timeline-desc">
+              <p>Where the curiosity began: a first spark for technology, problem-solving and making things from scratch — taking machines apart, exploring how software works and writing a very first lines of code.</p>
+            </div>
+            <div class="timeline-tags"><span>Information Technology</span><span>Mathematics</span><span>DBMS</span><span>First Code</span></div>
+          </div>
         </article>
       </div>
     </section>
 
     <!-- 4. Skills / Tech Stack Section -->
     <section class="section section-tint sk-section" id="skills" data-sk-section>
-      <div class="sk-bg" aria-hidden="true"></div>
       <div class="container">
         <header class="section-heading sk-heading reveal">
           <p class="eyebrow">03 — Tech stack</p>
@@ -161,8 +165,7 @@
 
         <div class="sk-layout">
           <div class="sk-cards">
-            <article class="sk-card reveal card-3d card-3d-entrance" data-sk-card>
-              <span class="sk-card-glow" aria-hidden="true"></span>
+            <article class="sk-card reveal" data-sk-card>
               <span class="sk-card-icon" aria-hidden="true"><i data-lucide="code-2"></i></span>
               <h3 class="sk-card-title">Frontend</h3>
               <p class="sk-card-desc">Building responsive and interactive web interfaces.</p>
@@ -175,8 +178,7 @@
               </ul>
             </article>
 
-            <article class="sk-card reveal card-3d card-3d-entrance" data-sk-card>
-              <span class="sk-card-glow" aria-hidden="true"></span>
+            <article class="sk-card reveal" data-sk-card>
               <span class="sk-card-icon" aria-hidden="true"><i data-lucide="server"></i></span>
               <h3 class="sk-card-title">Backend</h3>
               <p class="sk-card-desc">Developing APIs, backend services, and application logic.</p>
@@ -189,8 +191,7 @@
               </ul>
             </article>
 
-            <article class="sk-card reveal card-3d card-3d-entrance" data-sk-card>
-              <span class="sk-card-glow" aria-hidden="true"></span>
+            <article class="sk-card reveal" data-sk-card>
               <span class="sk-card-icon" aria-hidden="true"><i data-lucide="database"></i></span>
               <h3 class="sk-card-title">Database</h3>
               <p class="sk-card-desc">Working with structured and NoSQL data systems.</p>
@@ -201,8 +202,7 @@
               </ul>
             </article>
 
-            <article class="sk-card reveal card-3d card-3d-entrance" data-sk-card>
-              <span class="sk-card-glow" aria-hidden="true"></span>
+            <article class="sk-card reveal" data-sk-card>
               <span class="sk-card-icon" aria-hidden="true"><i data-lucide="wrench"></i></span>
               <h3 class="sk-card-title">Tools &amp; Development</h3>
               <p class="sk-card-desc">Tools and workflows used for modern software development.</p>
@@ -216,7 +216,7 @@
             </article>
           </div>
 
-          <aside class="sk-graph reveal card-3d" data-sk-graph aria-labelledby="sk-graph-title">
+          <aside class="sk-graph reveal" data-sk-graph aria-labelledby="sk-graph-title">
             <div class="sk-graph-head">
               <div>
                 <h3 class="sk-graph-title" id="sk-graph-title">Stack status</h3>
@@ -264,17 +264,16 @@
         <div class="section-heading split-heading reveal">
           <div>
             <p class="eyebrow">04 / Selected work</p>
-            <h2>Featured<br /><em>Projects.</em></h2>
+            <h2>Featured <em>Projects.</em></h2>
           </div>
           <p class="heading-note">Things I&rsquo;ve built with code.</p>
         </div>
 
         <div class="projects-showcase">
-          <article class="project-showcase project-showcase-featured reveal card-3d card-3d-entrance">
+          <article class="project-showcase project-showcase-featured reveal">
             <div class="project-media">
               <span class="project-flag">Featured Project</span>
               <img src="novacart-logo.png" alt="NovaCart storefront preview" loading="lazy" />
-              <span class="project-media-grid" aria-hidden="true"></span>
             </div>
             <div class="project-ticker" aria-hidden="true">
               <div class="project-ticker-track">
@@ -306,10 +305,9 @@
             </div>
           </article>
 
-          <article class="project-showcase project-showcase-secondary reveal reveal-delay card-3d card-3d-entrance">
+          <article class="project-showcase project-showcase-secondary reveal reveal-delay">
             <div class="project-media project-media-logo">
               <img src="northstarlogo.png" alt="Northstar PDF logo" loading="lazy" />
-              <span class="project-media-grid" aria-hidden="true"></span>
             </div>
             <div class="project-ticker" aria-hidden="true">
               <div class="project-ticker-track">
@@ -340,7 +338,7 @@
           </article>
         </div>
 
-        <div class="projects-more reveal card-3d">
+        <div class="projects-more reveal">
           <h3>Want to see more?</h3>
           <p>Explore my GitHub for more development activity and repositories.</p>
           <a class="button button-primary" href="#github"><span>View GitHub</span> <i data-lucide="arrow-right"></i></a>
@@ -350,17 +348,13 @@
 
     <!-- 6. GitHub Activity Section -->
     <section class="section section-tint gh-section" id="github" data-github-activity aria-busy="true">
-      <div class="gh-bg" aria-hidden="true"></div>
-      <div class="gh-particles" aria-hidden="true">
-        <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
-      </div>
       <div class="container">
         <div class="section-heading split-heading reveal">
           <div>
             <p class="eyebrow">05 / GitHub activity</p>
-            <h2>Live from<br /><em>my GitHub.</em></h2>
+            <h2>Live from <em>my GitHub.</em></h2>
           </div>
-          <p class="heading-note">Fetched from the GitHub API on every visit.<br />Real numbers only — never faked.</p>
+          <p class="heading-note">Fetched from the GitHub API on every visit.<br /> Real numbers only — never faked.</p>
         </div>
 
         <p class="gh-status" data-gh-status role="status" aria-live="polite">Loading live GitHub data…</p>
@@ -380,7 +374,7 @@
           <button class="button button-quiet gh-retry" type="button" data-gh-retry><span>Try again</span><i data-lucide="refresh-cw"></i></button>
         </div>
 
-        <div class="gh-dashboard card-3d" data-gh-dashboard hidden>
+        <div class="gh-dashboard" data-gh-dashboard hidden>
           <header class="gh-topbar">
             <div class="gh-identity">
               <span class="gh-avatar" data-gh-avatar aria-hidden="true"></span>
@@ -463,13 +457,13 @@
       <div class="section-heading split-heading reveal">
         <div>
           <p class="eyebrow">06 / What I do</p>
-          <h2>Useful by<br /><em>design.</em></h2>
+          <h2>Useful by <em>design.</em></h2>
         </div>
-        <p class="heading-note">Ideas shaped into practical,<br />maintainable digital products.</p>
+        <p class="heading-note">Ideas shaped into practical,<br /> maintainable digital products.</p>
       </div>
 
       <div class="services-list">
-        <article class="service reveal card-3d card-3d-entrance">
+        <article class="service reveal">
           <div class="service-head">
             <span class="project-index">01</span>
             <span class="project-category">Interface development</span>
@@ -478,10 +472,9 @@
           <h3>Web experiences</h3>
           <p class="service-desc">Responsive interfaces that feel clear, fast and effortless on every device. I care about the details that turn a usable page into one people enjoy.</p>
           <ul class="project-stack"><li>Responsive UI</li><li>Accessibility</li><li>Motion</li></ul>
-          <span class="service-arrow" aria-hidden="true"><i data-lucide="arrow-up-right"></i></span>
         </article>
 
-        <article class="service reveal reveal-delay card-3d card-3d-entrance">
+        <article class="service reveal reveal-delay">
           <div class="service-head">
             <span class="project-index">02</span>
             <span class="project-category">Product engineering</span>
@@ -490,10 +483,9 @@
           <h3>Full-stack applications</h3>
           <p class="service-desc">Complete products built from the database up. Thoughtful frontends connect to dependable APIs, authentication and clean data models.</p>
           <ul class="project-stack"><li>Node.js</li><li>REST APIs</li><li>Databases</li></ul>
-          <span class="service-arrow" aria-hidden="true"><i data-lucide="arrow-up-right"></i></span>
         </article>
 
-        <article class="service reveal card-3d card-3d-entrance">
+        <article class="service reveal">
           <div class="service-head">
             <span class="project-index">03</span>
             <span class="project-category">Creative solutions</span>
@@ -502,7 +494,6 @@
           <h3>Creative problem-solving</h3>
           <p class="service-desc">I turn fuzzy ideas into focused, practical digital products by asking the right questions and choosing the simplest tool that solves the problem well.</p>
           <ul class="project-stack"><li>Discovery</li><li>Prototyping</li><li>Optimization</li></ul>
-          <span class="service-arrow" aria-hidden="true"><i data-lucide="arrow-up-right"></i></span>
         </article>
       </div>
     </section>
@@ -512,10 +503,9 @@
       <div class="container contact-grid">
         <div class="contact-copy reveal">
           <p class="eyebrow">07 / Say hello</p>
-          <h2>Have an idea?<br /><em>Let’s build it.</em></h2>
+          <h2>Have an idea? <em>Let’s build it.</em></h2>
           <p>Whether it’s a project, a collaboration, or just a good conversation about technology, my inbox is open.</p>
           <a class="email-link" href="mailto:prajwalpradhan009@gmail.com">prajwalpradhan009@gmail.com <i data-lucide="arrow-up-right"></i></a>
-          <br><br>
           <div class="hero-socials" aria-label="Social profiles">
             <a class="social-circle social-github" href="https://github.com/prajwalpradhan009-spec" target="_blank" rel="noreferrer" aria-label="GitHub">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.04c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.33-1.76-1.33-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49.99.11-.77.42-1.3.76-1.6-2.67-.3-5.47-1.34-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.29-1.55 3.3-1.23 3.3-1.23.66 1.65.24 2.87.12 3.17a4.7 4.7 0 0 1 1.24 3.22c0 4.6-2.8 5.62-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.69.83.57A12 12 0 0 0 12 .5Z"></path></svg>
@@ -531,7 +521,7 @@
             </a>
           </div>
         </div>
-        <form class="contact-form reveal reveal-delay card-3d">
+        <form class="contact-form reveal reveal-delay">
           <label>Your name<input type="text" placeholder="Jane Doe" required /></label>
           <label>Email address<input type="email" placeholder="jane@example.com" required /></label>
           <label>Tell me about it<textarea placeholder="A little about your idea..." rows="4" required></textarea></label>
@@ -546,13 +536,12 @@
       <div class="section-heading split-heading reveal">
         <div>
           <p class="eyebrow">08 / Personal profile</p>
-          <h2 id="profile-title">Prajwal<br /><em>Pradhan.</em></h2>
+          <h2 id="profile-title">Prajwal <em>Pradhan.</em></h2>
         </div>
-        <p class="heading-note">BCA Student &amp; Full-Stack Developer.<br />Director at NewarPrime.</p>
+        <p class="heading-note">BCA Student &amp; Full-Stack Developer.<br /> Director at NewarPrime.</p>
       </div>
       <div class="profile-showcase reveal">
-        <div class="profile-card-3d card-3d card-3d-entrance">
-          <span class="profile-card-glow" aria-hidden="true"></span>
+        <div class="profile-card">
           <div class="profile-card-top">
             <span class="brand-logo"><img src="profile.png" alt="Prajwal Pradhan" /></span>
             <div class="profile-card-identity">

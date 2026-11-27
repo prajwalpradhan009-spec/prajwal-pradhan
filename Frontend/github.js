@@ -278,18 +278,6 @@
       <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${escapeAttribute(
         `Contributions per month over the last ${series.length} months`
       )}">
-        <defs>
-          <linearGradient id="ghBarFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--gh-accent-bright)" stop-opacity="0.78" />
-            <stop offset="52%" stop-color="var(--gh-accent)" stop-opacity="0.56" />
-            <stop offset="100%" stop-color="var(--gh-accent-deep)" stop-opacity="0.42" />
-          </linearGradient>
-          <linearGradient id="ghChartFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="var(--gh-accent)" stop-opacity="0.42" />
-            <stop offset="55%" stop-color="var(--mint)" stop-opacity="0.22" />
-            <stop offset="100%" stop-color="var(--mint)" stop-opacity="0" />
-          </linearGradient>
-        </defs>
         ${grid}
         <path class="gh-chart-area" d="${area}" />
         <g class="gh-chart-bars">${bars}</g>
