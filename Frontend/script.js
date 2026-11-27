@@ -71,6 +71,25 @@ const navLinks = document.querySelector('.nav-links');
 const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 const trackScrollProgress = window.matchMedia('(min-width: 851px) and (hover: hover) and (pointer: fine)');
 
+if (!reduceMotionQuery.matches && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  document.querySelectorAll('.button-primary:not(:disabled)').forEach((button) => {
+    const resetMagneticOffset = () => {
+      button.style.setProperty('--magnetic-x', '0px');
+      button.style.setProperty('--magnetic-y', '0px');
+    };
+
+    button.addEventListener('pointermove', (event) => {
+      const bounds = button.getBoundingClientRect();
+      const offsetX = (event.clientX - bounds.left - bounds.width / 2) / bounds.width;
+      const offsetY = (event.clientY - bounds.top - bounds.height / 2) / bounds.height;
+      button.style.setProperty('--magnetic-x', `${offsetX * 5}px`);
+      button.style.setProperty('--magnetic-y', `${offsetY * 4}px`);
+    });
+    button.addEventListener('pointerleave', resetMagneticOffset);
+    button.addEventListener('blur', resetMagneticOffset);
+  });
+}
+
 let scrollFrameQueued = false;
 let lastScrollProgress = -1;
 let lastHeaderScrolled = null;

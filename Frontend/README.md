@@ -19,7 +19,7 @@ This is a fast, dependency-free portfolio front end. Open `index.html` directly 
 Save the supplied portrait beside `index.html` with this exact filename:
 
 ```text
-profile.jpg
+profile.png
 ```
 
 The same image is used in the navbar logo and the About section. If the file is missing, both locations fall back to the `PP` mark. The About section also uses `img.png` beside `index.html`.
