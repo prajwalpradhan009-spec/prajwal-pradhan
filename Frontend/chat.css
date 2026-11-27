@@ -20,12 +20,11 @@
   padding: 0;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: var(--text);
-  color: var(--bg);
-  box-shadow: var(--shadow);
+  background: var(--accent);
+  color: var(--on-accent);
   transition: background-color .18s;
 }
-.ai-launcher:hover { background: var(--accent-ink); }
+.ai-launcher:hover { background: var(--bg); color: var(--accent-ink); border-color: var(--accent); }
 .ai-launcher svg { grid-area: 1 / 1; width: 1.5rem; height: 1.5rem; stroke-width: 1.7; }
 .ai-launcher-close, .ai-root.is-open .ai-launcher-icon { opacity: 0; }
 .ai-root.is-open .ai-launcher-close { opacity: 1; }
@@ -40,7 +39,6 @@
   border: 1px solid var(--line);
   border-radius: var(--radius);
   background: var(--bg);
-  box-shadow: 0 3px 12px rgb(48 34 24 / 8%);
 }
 .ai-head, .ai-identity, .ai-head-actions, .ai-name, .ai-typing, .ai-composer-row {
   display: flex;
@@ -57,20 +55,20 @@
   border: 0;
   border-radius: .55rem;
 }
-.ai-avatar { position: relative; width: 2.25rem; height: 2.25rem; background: var(--accent-soft); color: var(--accent-ink); }
+.ai-avatar { position: relative; width: 2.25rem; height: 2.25rem; background: var(--bg); color: var(--accent-ink); }
 .ai-avatar svg { width: 1.2rem; height: 1.2rem; stroke-width: 1.65; }
 .ai-online { position: absolute; right: -2px; bottom: -2px; width: .65rem; height: .65rem; border-radius: 50%; background: var(--accent); border: 2px solid var(--panel); }
 .ai-title, .ai-subtitle { display: block; }
 .ai-title { color: var(--text); line-height: 1.3; }
 .ai-subtitle, .ai-online-label { font-size: .75rem; color: var(--secondary); line-height: 1.4; }
 .ai-icon-btn { width: 2rem; height: 2rem; color: var(--text); background: transparent; }
-.ai-icon-btn:hover { background: var(--accent-soft); }
+.ai-icon-btn:hover { color: var(--accent-ink); }
 .ai-icon-btn svg, .ai-send svg, .ai-name svg, .ai-jump svg { width: 1rem; height: 1rem; stroke-width: 1.7; }
 .ai-log { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; align-items: stretch; gap: .85rem; padding: 1rem; scrollbar-width: thin; }
 .ai-msg { flex: none; display: grid; justify-items: start; gap: .35rem; min-width: 0; }
 .ai-msg--user { justify-items: end; }
 .ai-bubble { width: fit-content; max-width: 96%; padding: .65rem .85rem; border: 1px solid var(--line); border-radius: .85rem; background: var(--panel); color: var(--muted); overflow-wrap: anywhere; font-size: .9375rem; }
-.ai-msg--user .ai-bubble { max-width: 88%; background: var(--accent-soft); }
+.ai-msg--user .ai-bubble { max-width: 88%; }
 .ai-msg--error .ai-bubble { border-color: var(--accent); }
 .ai-name, .ai-actions-label { color: var(--accent-ink); font-size: .8125rem; font-weight: 600; }
 .ai-rich > * + * { margin-top: .5rem; }
@@ -85,12 +83,12 @@
 .ai-suggestions, .ai-jumps { display: flex; gap: .45rem; overflow-x: auto; padding: .2rem; scrollbar-width: thin; }
 .ai-chip, .ai-jump, .ai-retry { display: inline-flex; align-items: center; gap: .3rem; flex: none; padding: .4rem .65rem; border: 1px solid var(--line); border-radius: .4rem; background: var(--bg); color: var(--text); font-size: .8125rem; line-height: 1.4; }
 .ai-jump, .ai-retry { color: var(--accent-ink); }
-:is(.ai-chip, .ai-jump, .ai-retry):hover { border-color: var(--accent); background: var(--accent-soft); }
+:is(.ai-chip, .ai-jump, .ai-retry):hover { border-color: var(--accent); color: var(--accent-ink); }
 .ai-composer-row { align-items: flex-end; }
 .ai-input { min-width: 0; max-height: 6rem; flex: 1; padding: .55rem .7rem; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: .55rem; font-size: 1rem; line-height: 1.45; resize: none; }
 .ai-input::placeholder { color: var(--secondary); }
-.ai-send { width: 2.5rem; height: 2.5rem; background: var(--text); color: var(--bg); }
-.ai-send:disabled { opacity: .45; }
+.ai-send { width: 2.5rem; height: 2.5rem; background: var(--accent); color: var(--on-accent); }
+.ai-send:disabled { background: var(--line); color: var(--muted); }
 .ai-hint { display: flex; justify-content: space-between; font-size: .75rem; color: var(--secondary); }
 .ai-count { visibility: hidden; }
 .ai-count.is-visible { visibility: visible; }

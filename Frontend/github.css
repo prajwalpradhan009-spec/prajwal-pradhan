@@ -19,7 +19,7 @@
   height: 3rem;
   border: 1px solid var(--line);
   border-radius: 50%;
-  background: var(--accent-soft);
+  background: var(--panel);
   color: var(--accent-ink);
   overflow: hidden;
 }
@@ -47,11 +47,11 @@
 .gh-chart svg { display: block; width: 100%; height: auto; }
 .gh-chart-grid { stroke: var(--line); stroke-dasharray: 3 5; }
 .gh-chart-label, .gh-chart-axis { fill: var(--secondary); font: 12px var(--sans); }
-.gh-chart-area { fill: var(--accent-soft); }
+.gh-chart-area { fill: none; }
 .gh-chart-line { fill: none; stroke: var(--accent-ink); stroke-width: 2; stroke-linejoin: round; }
-.gh-chart-bar { fill: var(--accent); opacity: .55; }
+.gh-chart-bar { fill: var(--line); }
 .gh-chart-dot { fill: var(--panel); stroke: var(--accent-ink); stroke-width: 2; }
-.gh-chart-bar.is-active, .gh-chart-dot.is-active { opacity: 1; fill: var(--accent-ink); }
+.gh-chart-bar.is-active, .gh-chart-dot.is-active { fill: var(--accent-ink); }
 .gh-chart-hover, .gh-tooltip {
   position: absolute;
   z-index: 4;
@@ -74,7 +74,7 @@
 .gh-repo-top svg { margin-left: auto; }
 .gh-repo-desc { font-size: .95rem; overflow-wrap: anywhere; }
 .gh-repo-meta, .gh-repo-badge { color: var(--secondary); font-size: .8125rem; }
-.gh-repo-dot { width: .55rem; height: .55rem; border-radius: 50%; }
+.gh-repo-dot { width: .55rem; height: .55rem; border-radius: 50%; background: var(--accent); }
 
 .gh-legend { gap: .3rem; color: var(--secondary); font-size: .8125rem; }
 .gh-calendar-wrap {
@@ -88,8 +88,11 @@
 .gh-calendar-months span { grid-row: 1; }
 .gh-calendar { grid-template-rows: repeat(7, auto); }
 .gh-cal-row { display: contents; }
-.gh-cell { width: 100%; aspect-ratio: 1; border-radius: 3px; background: var(--gh-day-color, var(--line)); }
-.gh-cell[data-level="0"] { background: color-mix(in srgb, var(--gh-day-color, var(--line)) 30%, var(--line)); }
+.gh-cell { width: 100%; aspect-ratio: 1; border-radius: 3px; background: var(--panel); border: 1px solid var(--line); }
+.gh-cell[data-level="1"] { background: var(--line); }
+.gh-cell[data-level="2"] { background: color-mix(in srgb, var(--line) 60%, var(--text)); }
+.gh-cell[data-level="3"] { background: var(--accent-ink); }
+.gh-cell[data-level="4"] { background: var(--text); }
 .gh-legend .gh-cell { width: 11px; }
 .gh-calendar .gh-cell:is(:hover, :focus-visible) { outline: 2px solid var(--text); outline-offset: 1px; }
 .gh-calendar-total { font-weight: 600; }

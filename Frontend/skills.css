@@ -10,7 +10,7 @@
 .sk-graph-head { display: flex; flex-wrap: wrap; gap: .8rem; align-items: start; }
 .sk-graph-sub { margin-top: .6rem; }
 .sk-graph-badge, .sk-row-tag { font-size: .8125rem; color: var(--accent-ink); }
-.sk-graph-badge { background: var(--accent-soft); padding: .2rem .6rem; border-radius: .35rem; }
+.sk-graph-badge { background: var(--panel); padding: .2rem .6rem; border-radius: .35rem; }
 .sk-rows, .sk-row-tech { padding: 0; list-style: none; }
 .sk-rows { margin-block: 1rem; border-bottom: 1px solid var(--line); }
 .sk-rows > li {
@@ -41,7 +41,7 @@
   .sk-cards { grid-template-columns: minmax(0, 1fr); }
 }
 
-/* Technology marks retain their individual brand colors. */
+/* Keep the technology marks' silhouettes within the portfolio palette. */
 .sk-logo {
   display: inline-flex;
   flex: 0 0 auto;
@@ -49,11 +49,11 @@
   justify-content: center;
   width: 18px;
   height: 18px;
-  color: #fff;
+  color: var(--on-accent);
   font: 800 9px/1 Arial, sans-serif;
   letter-spacing: -0.06em;
   border-radius: 5px;
-  background: #62727a;
+  background: var(--accent);
 }
 .sk-logo::before {
   content: attr(data-mark);
@@ -70,14 +70,8 @@
   fill: currentColor;
   stroke: none;
 }
-.sk-logo[data-tech="html"] {
-  background: #e44d26;
-  clip-path: polygon(8% 0, 92% 0, 83% 88%, 50% 100%, 17% 88%);
-  border-radius: 0;
-  padding-bottom: 2px;
-}
+.sk-logo[data-tech="html"],
 .sk-logo[data-tech="css"] {
-  background: #1572b6;
   clip-path: polygon(8% 0, 92% 0, 83% 88%, 50% 100%, 17% 88%);
   border-radius: 0;
   padding-bottom: 2px;
@@ -86,97 +80,52 @@
   justify-content: flex-end;
   align-items: flex-end;
   padding: 0 2px 2px 0;
-  color: #242424;
-  background: #f0db4f;
   font-size: 8px;
 }
 .sk-logo[data-tech="react"] {
-  color: #61dafb;
+  color: var(--accent-ink);
   background: transparent;
 }
 .sk-logo[data-tech="node"] {
-  color: #fff;
-  background: #43853d;
   clip-path: polygon(25% 3%, 75% 3%, 100% 50%, 75% 97%, 25% 97%, 0 50%);
 }
 .sk-logo[data-tech="express"] {
   width: 22px;
-  color: #f4f4f4;
-  background: #30343a;
   font-size: 10px;
   font-weight: 700;
 }
 .sk-logo[data-tech="python"] {
-  color: #fff;
-  background: linear-gradient(145deg, #3776ab 0 50%, #ffd343 50%);
   border-radius: 6px 6px 6px 3px;
-}
-.sk-logo[data-tech="fastapi"] {
-  color: #fff;
-  background: #009688;
 }
 .sk-logo[data-tech="rest"] {
   width: 24px;
-  color: #fff;
-  background: #5865f2;
   font-size: 7px;
   letter-spacing: -0.08em;
 }
 .sk-logo[data-tech="mongodb"] {
-  color: #fff;
-  background: #47a248;
   border-radius: 90% 15% 90% 15%;
   transform: rotate(-35deg) scale(0.82);
 }
 .sk-logo[data-tech="mysql"] {
   width: 21px;
-  color: #fff;
-  background: #00758f;
   font-size: 8px;
 }
 .sk-logo[data-tech="sql"] {
-  color: #fff;
-  background: #cc2927;
   border-radius: 50% / 22%;
 }
 .sk-logo[data-tech="git"] {
-  color: #fff;
-  background: #f05032;
   transform: rotate(45deg) scale(0.82);
   border-radius: 3px;
 }
-.sk-logo[data-tech="github"] {
-  color: #fff;
-  background: #24292f;
-}
 .sk-logo[data-tech="vscode"] {
-  color: #fff;
-  background: #007acc;
   font-size: 9px;
 }
 .sk-logo[data-tech="postman"] {
-  color: #fff;
-  background: #ff6c37;
   border-radius: 50%;
 }
 .sk-logo[data-tech="npm"] {
   width: 24px;
-  color: #fff;
-  background: #cb3837;
   border-radius: 3px;
   font-size: 8px;
   letter-spacing: -0.08em;
-}
-.sk-logo[data-tech="responsive"] {
-  color: #fff;
-  background: #7b61a8;
-}
-.sk-logo[data-tech="ai"],
-.sk-logo[data-tech="chatbot"] {
-  color: #fff;
-  background: #7656c9;
-}
-.sk-logo[data-tech="ollama"] {
-  color: #fff;
-  background: #262626;
 }

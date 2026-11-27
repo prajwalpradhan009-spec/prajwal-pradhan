@@ -54,28 +54,6 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const numberFormat = new Intl.NumberFormat();
 
-  // GitHub's own linguist colours, with a green fallback.
-  const LANGUAGE_COLORS = {
-    JavaScript: '#f1e05a',
-    TypeScript: '#3178c6',
-    Python: '#3572A5',
-    HTML: '#e34c26',
-    CSS: '#663399',
-    Java: '#b07219',
-    'C++': '#f34b7d',
-    C: '#8b949e',
-    'C#': '#178600',
-    PHP: '#4F5D95',
-    Ruby: '#701516',
-    Go: '#00ADD8',
-    Rust: '#dea584',
-    Shell: '#89e051',
-    Swift: '#F05138',
-    Kotlin: '#A97BFF',
-    Dart: '#00B4AB',
-    Jupyter: '#DA5B0B',
-  };
-
   const CONTRIBUTION_UNAVAILABLE_COPY = {
     'missing-token':
       'The server has no GitHub token configured, and GitHub only shares contribution history with authenticated requests. Nothing is shown rather than an estimate.',
@@ -84,9 +62,7 @@
     'user-not-found': 'GitHub could not find an account matching the configured username.',
   };
 
-  // GitHub's own contributionLevel enum, in the order of its colour scale.
-  // Only used to pick a legend step; the square colour itself is whatever
-  // GitHub returned for that day.
+  // Cells and legend swatches use the same theme colour for each GitHub level.
   const LEVEL_INDEX = {
     NONE: 0,
     FIRST_QUARTILE: 1,
@@ -399,28 +375,18 @@
     el.calendarMonths.replaceChildren(fragment);
   }
 
-  /** Paints the Less/More legend with the colours GitHub returned for the calendar. */
   function renderLegend(legend) {
     if (!el.legend || !Array.isArray(legend)) return;
     el.legend.querySelectorAll('[data-gh-legend-swatch]').forEach(swatch => {
       const entry = legend[Number(swatch.dataset.level)];
-      const color = entry?.color;
-      if (typeof color !== 'string' || !color) {
-        swatch.removeAttribute('style');
-        return;
-      }
-      // Only the custom property is set, never `background`, so the stylesheet
-      // composes the empty step exactly as it composes the matching squares and
-      // the legend reads the same as the grid above it.
-      swatch.style.setProperty('--gh-day-color', color);
-      swatch.title = entry.name ? entry.name.replace(/_/g, ' ').toLowerCase() : '';
+      swatch.title = entry?.name ? entry.name.replace(/_/g, ' ').toLowerCase() : '';
     });
   }
 
   /**
    * Renders contributionCalendar.weeks exactly as GitHub returned them: one
    * grid cell per contributionDays entry, at the column for its week and the
-   * row for its weekday, painted with the colour GitHub chose for that day.
+   * row for its weekday, styled according to its reported contribution level.
    * No cell is padded, reordered or filled in — a day GitHub reported as 0 is
    * GitHub's own empty square.
    */
@@ -448,9 +414,6 @@
         cell.dataset.level = String(Number.isInteger(LEVEL_INDEX[day.contributionLevel]) ? LEVEL_INDEX[day.contributionLevel] : 0);
         cell.dataset.count = String(count);
         cell.dataset.date = String(day.date);
-        if (typeof day.color === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(day.color.trim())) {
-          cell.style.setProperty('--gh-day-color', day.color.trim());
-        }
         cell.style.gridArea = `${weekday + 1} / ${weekIndex + 1}`;
         cell.tabIndex = -1;
         cell.setAttribute('aria-label', describeCell(cell));
@@ -557,7 +520,6 @@
       if (repository.language) {
         const language = createElement('span', 'gh-repo-metric gh-repo-language');
         const dot = createElement('i', 'gh-repo-dot');
-        dot.style.background = LANGUAGE_COLORS[repository.language] || 'var(--gh-accent)';
         language.append(dot, createElement('span', null, repository.language));
         meta.append(language);
       }
