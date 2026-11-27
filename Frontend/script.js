@@ -139,7 +139,7 @@ window.addEventListener('resize', () => {
 /* ------------------------------------------------- typewriter effect */
 const phrases = ['Full-Stack Development', 'Python Development', 'Creative Problem Solving', 'Building for the web'];
 const typedText = document.querySelector('#typed-text');
-if (typedText) {
+if (typedText && !reduceMotionQuery.matches) {
   let phraseIndex = 0;
   let characterIndex = phrases[0].length;
   let deleting = true;
