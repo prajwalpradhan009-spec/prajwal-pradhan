@@ -93,10 +93,8 @@ pageRoutes.forEach(route => {
 app.get('/prajwal-pradhan', (request, response) => {
   response.sendFile(path.join(__dirname, '..', 'Frontend', 'prajwal-pradhan.html'));
 });
-app.get('/sitemap.xml', (request, response) => {
-  response.sendFile(path.join(__dirname, '..', 'Frontend', 'public', 'sitemap.xml'));
-});
 app.use(express.static(path.join(__dirname, '..', 'Frontend')));
+app.use(express.static(path.join(__dirname, '..', 'Frontend', 'public')));
 
 const projects = [
   { slug: 'northstar-file-studio', title: 'Northstar File Studio', description: 'A focused utility for merging PDFs and converting, compressing and organizing images.', technologies: ['Python', 'CustomTkinter', 'Pillow'] },

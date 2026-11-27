@@ -2,9 +2,9 @@ services:
   - type: web
     name: prajwal-portfolio
     runtime: node
-    rootDir: backend
-    buildCommand: npm install
-    startCommand: npm start
+    rootDir: .
+    buildCommand: npm --prefix backend ci
+    startCommand: npm --prefix backend start
     envVars:
       - key: MONGODB_URI
         sync: false
