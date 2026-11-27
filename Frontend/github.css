@@ -68,7 +68,7 @@
 
 .gh-repos { gap: .6rem; }
 .gh-repo-link { display: grid; gap: .45rem; padding: .9rem 1rem; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); transition: border-color .2s; }
-.gh-repo-link:hover { border-color: var(--accent); }
+.gh-repo-link:hover { border-color: var(--text); }
 .gh-repo-top, .gh-repo-meta, .gh-repo-metric { display: flex; align-items: center; flex-wrap: wrap; gap: .35rem .65rem; }
 .gh-repo-name { color: var(--accent-ink); font-weight: 650; overflow-wrap: anywhere; }
 .gh-repo-top svg { margin-left: auto; }
@@ -91,7 +91,7 @@
 .gh-cell { width: 100%; aspect-ratio: 1; border-radius: 3px; background: var(--panel); border: 1px solid var(--line); }
 .gh-cell[data-level="1"] { background: var(--line); }
 .gh-cell[data-level="2"] { background: color-mix(in srgb, var(--line) 60%, var(--text)); }
-.gh-cell[data-level="3"] { background: var(--accent-ink); }
+.gh-cell[data-level="3"] { background: color-mix(in srgb, var(--line) 30%, var(--text)); }
 .gh-cell[data-level="4"] { background: var(--text); }
 .gh-legend .gh-cell { width: 11px; }
 .gh-calendar .gh-cell:is(:hover, :focus-visible) { outline: 2px solid var(--text); outline-offset: 1px; }

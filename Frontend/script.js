@@ -69,6 +69,88 @@ const header = document.querySelector('.site-header');
 const menuToggle = document.querySelector('.menu-toggle');
 const navLinks = document.querySelector('.nav-links');
 const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+function initHeroMotion() {
+  const hero = document.querySelector('.hero-section');
+  const stars = hero?.querySelector('.hero-stars');
+  const portrait = hero?.querySelector('.hero-portrait');
+  if (!stars || !portrait) return;
+
+  // The first ten positions also form the sparser mobile composition.
+  const positions = [
+    [7, 10], [88, 6], [53, 25], [94, 37], [4, 52],
+    [66, 58], [20, 72], [86, 88], [43, 95], [6, 86],
+    [32, 6], [73, 14], [46, 12], [3, 28], [20, 37],
+    [61, 35], [38, 49], [98, 65], [54, 68], [77, 94],
+    [13, 61], [56, 45], [28, 81], [70, 79], [81, 49],
+    [94, 19], [51, 83], [35, 63], [63, 5], [17, 94],
+  ];
+  const particles = document.createDocumentFragment();
+  positions.forEach(([x, y], i) => {
+    const star = document.createElement('span');
+    star.className = 'hero-star';
+    star.style.left = x + '%';
+    star.style.top = y + '%';
+    const direction = i * 2.4;
+    star.style.setProperty('--drift-x', Math.round(Math.cos(direction) * 15) + 'px');
+    star.style.setProperty('--drift-y', Math.round(Math.sin(direction) * 20) + 'px');
+    star.style.setProperty('--drift-time', (11 + i % 8) + 's');
+    star.style.setProperty('--twinkle-time', (3.8 + i % 5) + 's');
+    star.style.setProperty('--phase', (-1.7 * i) + 's');
+    particles.append(star);
+  });
+  stars.append(particles);
+
+  const canTilt = window.matchMedia('(any-hover: hover) and (any-pointer: fine) and (prefers-reduced-motion: no-preference)');
+  let inView = false;
+  let frame = 0;
+  let pointerX = 0;
+  let pointerY = 0;
+
+  function resetTilt() {
+    cancelAnimationFrame(frame);
+    frame = 0;
+    portrait.classList.remove('is-tilting');
+    portrait.style.removeProperty('--portrait-tilt');
+  }
+
+  function updateTilt() {
+    frame = 0;
+    // Measure the stationary figure so the tilted image cannot affect its own input.
+    const bounds = portrait.getBoundingClientRect();
+    const x = Math.max(-1, Math.min(1, 2 * (pointerX - bounds.left) / bounds.width - 1));
+    const y = Math.max(-1, Math.min(1, 2 * (pointerY - bounds.top) / bounds.height - 1));
+    portrait.style.setProperty('--portrait-tilt',
+      `perspective(1000px) rotateX(${(-y * 3).toFixed(2)}deg) rotateY(${(x * 4).toFixed(2)}deg)`);
+    portrait.classList.add('is-tilting');
+  }
+
+  portrait.addEventListener('pointermove', event => {
+    if (!canTilt.matches || event.pointerType === 'touch') return;
+    pointerX = event.clientX;
+    pointerY = event.clientY;
+    if (!frame) frame = requestAnimationFrame(updateTilt);
+  }, { passive: true });
+  portrait.addEventListener('pointerleave', resetTilt);
+  portrait.addEventListener('pointercancel', resetTilt);
+  canTilt.addEventListener('change', resetTilt);
+  window.addEventListener('blur', resetTilt);
+
+  function syncMotion() {
+    const playing = inView && !document.hidden && !reduceMotionQuery.matches;
+    stars.classList.toggle('is-playing', playing);
+    if (!playing) resetTilt();
+  }
+  const observer = new IntersectionObserver(([entry]) => {
+    inView = entry.isIntersecting;
+    syncMotion();
+  });
+  observer.observe(hero);
+  document.addEventListener('visibilitychange', syncMotion);
+  reduceMotionQuery.addEventListener('change', syncMotion);
+}
+initHeroMotion();
+
 /* ------------------------------------------------- header height sync */
 const scrollRoot = document.documentElement;
 function syncHeaderOffset() {

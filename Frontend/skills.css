@@ -1,11 +1,7 @@
 .sk-section {
-  --sk-ink: #09090b;
-  --sk-blue: #1d4ed8;
-  --sk-border: #e4e4e7;
   --sk-gap: clamp(.65rem, 1.2vw, 1rem);
-  color-scheme: light;
-  background: #fff;
-  color: var(--sk-ink);
+  background: var(--bg);
+  color: var(--text);
 }
 .sk-heading {
   display: flex;
@@ -15,20 +11,18 @@
   gap: 1.25rem 2rem;
   margin-bottom: clamp(1.25rem, 2.6vw, 2.25rem);
 }
-.sk-heading .eyebrow { color: var(--sk-blue); }
-.sk-heading .eyebrow::before { background: var(--sk-blue); }
 .sk-heading h2 {
   margin: .85rem 0 .7rem;
   font-size: clamp(2.4rem, 5.4vw, 4.8rem);
   font-weight: 900;
   line-height: 1.04;
   letter-spacing: -.065em;
-  color: var(--sk-ink);
+  color: var(--text);
 }
-.sk-heading h2 span { color: var(--sk-blue); white-space: nowrap; }
+.sk-heading h2 span { color: var(--highlight); font-style: italic; white-space: nowrap; }
 .sk-subtitle {
   max-width: 58ch;
-  color: var(--sk-ink);
+  color: var(--muted);
   font-size: clamp(1rem, 1.35vw, 1.125rem);
   line-height: 1.55;
 }
@@ -40,14 +34,14 @@
   min-width: 8rem;
   min-height: 2.75rem;
   padding: .5rem .9rem;
-  border: 1px solid var(--sk-border);
+  border: 1px solid var(--line);
   border-radius: 2rem;
-  background: #fff;
-  color: var(--sk-ink);
+  background: var(--bg);
+  color: var(--text);
   font-size: .875rem;
   font-weight: 700;
 }
-.sk-playback:hover, .sk-playback:focus-visible { border-color: var(--sk-blue); color: var(--sk-blue); }
+.sk-playback:hover, .sk-playback:focus-visible { border-color: var(--text); color: var(--accent-ink); }
 .sk-playback svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 .sk-play-icon { display: none; fill: currentColor; stroke: none; }
 .sk-section[data-paused] .sk-play-icon { display: inline; }
@@ -59,7 +53,7 @@
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: thin;
-  scrollbar-color: var(--sk-border) white;
+  scrollbar-color: var(--line) var(--bg);
 }
 .sk-track, .sk-group { display: flex; width: max-content; }
 .sk-group {
@@ -79,10 +73,10 @@
   min-width: 9rem;
   height: clamp(3.75rem, 5.5vw, 4.75rem);
   padding: 0 clamp(1rem, 1.9vw, 1.65rem);
-  border: 1px solid var(--sk-border);
+  border: 1px solid var(--line);
   border-radius: .95rem;
-  background: #fff;
-  color: var(--sk-ink);
+  background: var(--bg);
+  color: var(--text);
   box-shadow: 0 1px 2px rgb(9 9 11 / 3%);
   font-size: clamp(1.05rem, 1.5vw, 1.35rem);
   font-weight: 750;
@@ -92,11 +86,12 @@
   transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
 }
 .sk-tech img, .sk-symbol { flex: none; width: clamp(1.65rem, 2.5vw, 2.1rem); height: clamp(1.65rem, 2.5vw, 2.1rem); object-fit: contain; }
-.sk-symbol { fill: none; stroke: var(--sk-blue); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.sk-section :focus-visible { outline: 2px solid var(--sk-blue); outline-offset: 2px; }
-.sk-tech:focus-visible { border-color: var(--sk-blue); }
+.sk-tech img { filter: grayscale(1); }
+.sk-symbol { fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.sk-section :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sk-tech:focus-visible { border-color: var(--text); }
 @media (hover: hover) {
-  .sk-tech:hover { border-color: var(--sk-blue); transform: translateY(-3px); box-shadow: 0 4px 9px rgb(9 9 11 / 8%); }
+  .sk-tech:hover { border-color: var(--text); transform: translateY(-3px); box-shadow: 0 4px 9px rgb(9 9 11 / 8%); }
 }
 
 @keyframes sk-marquee {
@@ -134,7 +129,7 @@
   .sk-tech:hover { transform: none; }
 }
 
-.sk-status { margin-top: 1.2rem; border-top: 1px solid var(--sk-border); }
+.sk-status { margin-top: 1.2rem; border-top: 1px solid var(--line); }
 .sk-status summary {
   display: flex;
   align-items: center;
@@ -146,13 +141,13 @@
   list-style: none;
 }
 .sk-status summary::-webkit-details-marker { display: none; }
-.sk-status summary span { color: var(--sk-blue); font: 400 1.5rem/1 var(--sans); }
+.sk-status summary span { color: var(--accent); font: 400 1.5rem/1 var(--sans); }
 .sk-status summary span::before { content: "+"; }
 .sk-status[open] summary span::before { content: "−"; }
-.sk-status-content { padding: .25rem 0 1rem; font-size: .9375rem; }
-.sk-status-content h3 { margin-bottom: .4rem; color: var(--sk-ink); }
+.sk-status-content { padding: .25rem 0 1rem; font-size: .9375rem; color: var(--muted); }
+.sk-status-content h3 { margin-bottom: .4rem; color: var(--text); }
 .sk-categories { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); gap: 1.5rem; margin: 1.25rem 0; }
 .sk-categories dt { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem; font-weight: 800; }
-.sk-categories dt span { color: var(--sk-blue); font-size: .8rem; }
+.sk-categories dt span { color: var(--accent-ink); font-size: .8rem; }
 .sk-categories dd { margin: .35rem 0 0; }
 .sk-categories dd + dd { font-size: .875rem; font-weight: 600; }

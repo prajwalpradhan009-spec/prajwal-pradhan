@@ -20,11 +20,11 @@
   padding: 0;
   border-radius: 50%;
   border: 1px solid var(--line);
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--primary);
+  color: var(--on-primary);
   transition: background-color .18s;
 }
-.ai-launcher:hover { background: var(--bg); color: var(--accent-ink); border-color: var(--accent); }
+.ai-launcher:hover { background: var(--bg); color: var(--accent-ink); border-color: var(--text); }
 .ai-launcher svg { grid-area: 1 / 1; width: 1.5rem; height: 1.5rem; stroke-width: 1.7; }
 .ai-launcher-close, .ai-root.is-open .ai-launcher-icon { opacity: 0; }
 .ai-root.is-open .ai-launcher-close { opacity: 1; }
@@ -83,12 +83,12 @@
 .ai-suggestions, .ai-jumps { display: flex; gap: .45rem; overflow-x: auto; padding: .2rem; scrollbar-width: thin; }
 .ai-chip, .ai-jump, .ai-retry { display: inline-flex; align-items: center; gap: .3rem; flex: none; padding: .4rem .65rem; border: 1px solid var(--line); border-radius: .4rem; background: var(--bg); color: var(--text); font-size: .8125rem; line-height: 1.4; }
 .ai-jump, .ai-retry { color: var(--accent-ink); }
-:is(.ai-chip, .ai-jump, .ai-retry):hover { border-color: var(--accent); color: var(--accent-ink); }
+:is(.ai-chip, .ai-jump, .ai-retry):hover { border-color: var(--text); color: var(--accent-ink); }
 .ai-composer-row { align-items: flex-end; }
 .ai-input { min-width: 0; max-height: 6rem; flex: 1; padding: .55rem .7rem; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: .55rem; font-size: 1rem; line-height: 1.45; resize: none; }
 .ai-input::placeholder { color: var(--secondary); }
-.ai-send { width: 2.5rem; height: 2.5rem; background: var(--accent); color: var(--on-accent); }
-.ai-send:disabled { background: var(--line); color: var(--muted); }
+.ai-send { width: 2.5rem; height: 2.5rem; background: var(--primary); color: var(--on-primary); }
+.ai-send:disabled { background: var(--panel); color: var(--secondary); box-shadow: inset 0 0 0 1px var(--line); }
 .ai-hint { display: flex; justify-content: space-between; font-size: .75rem; color: var(--secondary); }
 .ai-count { visibility: hidden; }
 .ai-count.is-visible { visibility: visible; }
