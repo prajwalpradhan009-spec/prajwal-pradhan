@@ -70,10 +70,10 @@ app.use(cors(allowedOrigins.length ? { origin: allowedOrigins } : {}));
 registerChatRoutes(app);
 
 app.use(express.json({ limit: '16kb' }));
-app.get('/', (request, response) => {
-  response.sendFile(path.join(__dirname, '..', 'Frontend', 'public', 'index.html'));
-});
 const pageRoutes = [
+  '/',
+  '/public',
+  '/public/index.html',
   '/home',
   '/about',
   '/learning',
@@ -85,10 +85,15 @@ const pageRoutes = [
   '/contact',
   '/profile'
 ];
-pageRoutes.forEach(route => {
-  app.get(route, (request, response) => {
-    response.sendFile(path.join(__dirname, '..', 'Frontend', 'public', 'index.html'));
-  });
+app.get(pageRoutes, (request, response) => {
+  // Keep relative asset URLs on the same base path for every homepage entry.
+  const pagePath = request.path.replace(/\/$/, '').toLowerCase();
+  const canonicalPath = pagePath.startsWith('/public') ? '/' : pagePath || '/';
+  if (request.path !== canonicalPath) {
+    const query = request.originalUrl.slice(request.path.length);
+    return response.redirect(308, canonicalPath + query);
+  }
+  response.sendFile(path.join(__dirname, '..', 'Frontend', 'public', 'index.html'));
 });
 app.get('/prajwal-pradhan', (request, response) => {
   response.sendFile(path.join(__dirname, '..', 'Frontend', 'prajwal-pradhan.html'));
