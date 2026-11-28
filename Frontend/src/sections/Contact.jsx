@@ -1,7 +1,67 @@
 import React, { useEffect, useState } from 'react'
 import { Mail, Send, CornerLeftUp } from 'lucide-react'
+import { SiFacebook, SiGithub, SiInstagram, SiLinkedin, SiWhatsapp } from 'react-icons/si'
 import { profile } from '../data/profile'
 import { apiBase } from '../api'
+
+const socialLogos = {
+  GitHub: <SiGithub size={17} color="#000000" aria-hidden="true" />,
+  LinkedIn: <SiLinkedin size={17} color="#0A66C2" aria-hidden="true" />,
+  Instagram: (
+    <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
+      <defs>
+        <radialGradient id="contact-instagram" cx="22%" cy="100%" r="120%">
+          <stop stopColor="#FFDC80" />
+          <stop offset=".28" stopColor="#FCAF45" />
+          <stop offset=".52" stopColor="#F56040" />
+          <stop offset=".75" stopColor="#C13584" />
+          <stop offset="1" stopColor="#5851DB" />
+        </radialGradient>
+      </defs>
+      <rect width="24" height="24" rx="6" fill="url(#contact-instagram)" />
+      <SiInstagram x="3" y="3" size={18} color="#FFFFFF" />
+    </svg>
+  ),
+  Facebook: <SiFacebook size={17} color="#1877F2" aria-hidden="true" />,
+}
+
+function whatsappLink(number) {
+  const digits = (number || '').replace(/[\s()-]/g, '')
+  const match = digits.match(/^(?:(?:\+|00)?91|0)?([1-9]\d{9})$/)
+  if (!match) return null
+  const message = 'Hello! I visited your portfolio and would like to connect with you.'
+  return 'https://wa.me/91' + match[1] + '?text=' + encodeURIComponent(message)
+}
+
+const whatsapp = whatsappLink(import.meta.env.VITE_WHATSAPP_NUMBER)
+const contactMotion = '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)'
+
+function ContactButton({ href, className = '', children }) {
+  const follow = (event) => {
+    if (event.pointerType !== 'mouse' || !matchMedia(contactMotion).matches) return
+    const link = event.currentTarget
+    const bounds = link.getBoundingClientRect()
+    link.style.setProperty('--contact-x', ((event.clientX - bounds.left) / bounds.width - 0.5) * 8 + 'px')
+    link.style.setProperty('--contact-y', ((event.clientY - bounds.top) / bounds.height - 0.5) * 5 + 'px')
+  }
+  const reset = (event) => {
+    event.currentTarget.style.removeProperty('--contact-x')
+    event.currentTarget.style.removeProperty('--contact-y')
+  }
+  return (
+    <a
+      href={href}
+      className={('contact-button ' + className).trim()}
+      target="_blank"
+      rel="noreferrer"
+      onPointerMove={follow}
+      onPointerLeave={reset}
+      onPointerCancel={reset}
+    >
+      {children}
+    </a>
+  )
+}
 
 function LocalTime() {
   const [date, setDate] = useState(() => new Date())
@@ -120,6 +180,15 @@ export default function Contact() {
                 {profile.email}
               </a>
             </div>
+            {whatsapp && (
+              <div>
+                <p className="mono">WhatsApp</p>
+                <ContactButton href={whatsapp} className="pill whatsapp-button">
+                  <SiWhatsapp size={20} color="#FFFFFF" aria-hidden="true" />
+                  Chat on WhatsApp
+                </ContactButton>
+              </div>
+            )}
             <div>
               <p className="mono">Location</p>
               <p>
@@ -130,9 +199,10 @@ export default function Contact() {
               <p className="mono">Elsewhere</p>
               <div className="socials">
                 {Object.entries(profile.socials).map(([label, url]) => (
-                  <a href={url} key={label} target="_blank" rel="noreferrer">
+                  <ContactButton href={url} key={label}>
+                    {socialLogos[label]}
                     {label}
-                  </a>
+                  </ContactButton>
                 ))}
               </div>
             </div>
