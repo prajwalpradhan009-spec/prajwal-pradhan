@@ -11,9 +11,7 @@ export function Navbar({ active }) {
       <header className={'masthead on-' + active}>
         <div className="mast-inner">
           <a href="#home" className="signature" aria-label="Prajwal Pradhan, home">
-            <b>
-              PP<span>.</span>
-            </b>
+            <img className="nav-portrait" src={profile.portrait} width="42" height="42" alt="" />
             <span className="signature-name">
               Prajwal
               <br />
@@ -53,9 +51,7 @@ export function Navbar({ active }) {
         data-lenis-prevent
       >
         <div className="flex items-center justify-between">
-          <b className="display">
-            PP<span className="orange">.</span>
-          </b>
+          <img className="nav-portrait" src={profile.portrait} width="42" height="42" alt={profile.name} />
           <button aria-label="Close navigation" onClick={close}>
             <X />
           </button>

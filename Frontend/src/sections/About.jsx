@@ -40,6 +40,12 @@ export default function About() {
               </React.Fragment>
             ))}
           </h2>
+          <div className="bio-details">
+            {profile.bioParagraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+            <p><strong>{profile.bioClosing}</strong></p>
+          </div>
           <div id="learning" className="timeline">
             <i aria-hidden="true" className="timeline-line" />
             {timeline.map((t) => (
