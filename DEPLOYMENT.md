@@ -4,7 +4,9 @@ Use the repository root as the project directory and Node.js 22.12 or later. Run
 
 ## Render
 
-The included `render.yaml` builds the frontend and runs the existing Express service. For an existing service with manually configured commands, set the build command to `npm ci --include=dev && npm run build` and the start command to `npm start`. The server handles the frontend, section URLs and same-origin APIs. Use `/api/health` to check the service. It reports a degraded database when the local-file contact fallback is active.
+The included `render.yaml` builds the frontend and checks the homepage at `/` before routing traffic. For a manually configured service, use the repository root, build with `npm ci --include=dev && npm run build` and start with `npm start`. A service that still runs `npm start` from `backend/` builds the frontend before starting Express if its deployment is missing `dist/index.html`. Moving the build to the build command saves that work on cold starts.
+
+The server handles the frontend, section URLs and same-origin APIs. Use `/api/health` to check the database connection. It reports a degraded database when the local-file contact fallback is active.
 
 ## Vercel
 

@@ -5,6 +5,7 @@ services:
     rootDir: .
     buildCommand: npm ci --include=dev && npm run build
     startCommand: npm --prefix backend start
+    healthCheckPath: /
     envVars:
       - key: MONGODB_URI
         sync: false
