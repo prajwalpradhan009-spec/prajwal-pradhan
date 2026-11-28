@@ -1,70 +1,42 @@
-# Free deployment with Render
+# Build and deployment
 
-The Render service hosts the portfolio frontend and the Node/MongoDB contact API together. The included `render.yaml` defines the service, build command, and start command.
+Use the repository root as the project directory and Node.js 22.12 or later. Run `npm ci --include=dev` and `npm run build` to produce `dist/`. Vite builds the main page and the existing standalone résumé and profile pages.
 
-## Render deployment
+## Render
 
-1. Create a free account at https://render.com.
-2. Choose **New > Blueprint** and select the GitHub repository.
-3. Render detects `render.yaml`. Enter your MongoDB Atlas connection string for `MONGODB_URI`.
-4. Enter your GitHub handle for `GITHUB_USERNAME` and a personal access token for `GITHUB_TOKEN`.
-5. Deploy the service.
+The included `render.yaml` builds the frontend and runs the existing Express service. For an existing service with manually configured commands, set the build command to `npm ci --include=dev && npm run build` and the start command to `npm start`. The server handles the frontend, section URLs and same-origin APIs. Use `/api/health` to check the service. It reports a degraded database when the local-file contact fallback is active.
 
-The service URL opens the portfolio. The API health check is available at `<service-url>/api/health`.
+## Vercel
 
-The frontend automatically uses the same origin in production. If you host the frontend separately, copy the Render service URL, add `/api`, and put it in `Frontend/config.js` as `window.PORTFOLIO_API_URL`.
+Import this repository with the root directory set to the repository root. The included `vercel.json` uses `npm run build`, serves `dist/` and maps the existing section routes to the React page. The files in `api/` provide Node functions for chat, GitHub and contact. Configure a Formspree form ID to enable email delivery on Vercel.
 
-## Environment variables
+## Environment
 
-`render.yaml` declares every variable the service needs. `MONGODB_URI`,
-`GITHUB_USERNAME` and `GITHUB_TOKEN` use `sync: false`, so Render prompts for
-their values instead of reading them from the repository.
+For local development, frontend build variables are read from the root `.env`. Express reads server variables from `backend/.env`. The provided example files list the supported names. In production, use the host’s environment settings.
 
-| Variable               | Required | Purpose                                          |
-| ---------------------- | -------- | ------------------------------------------------ |
-| `MONGODB_URI`          | No       | Contact form storage; falls back to a local file |
-| `GITHUB_USERNAME`      | Yes      | GitHub account the activity dashboard reads     |
-| `GITHUB_TOKEN`         | Yes      | Personal access token, used on the server only   |
-| `GITHUB_CACHE_MINUTES` | No       | GitHub cache lifetime, 1–60 (default 10)         |
-| `PORT`                 | No       | Defaults to 3000                                |
+| Variable | Used by | Purpose |
+| --- | --- | --- |
+| `VITE_FORMSPREE_ID` | Frontend build | Optional public Formspree form ID for direct form delivery |
+| `FORMSPREE_ID` | Vercel contact function | Formspree delivery through the same-origin API |
+| `MONGODB_URI` | Express | Persistent contact storage. Without a database, local development writes to `backend/data/contacts.json`. Local disk on hosted instances may be ephemeral. |
+| `GITHUB_USERNAME` | GitHub API | Optional account override. The default comes from the portfolio profile. |
+| `GITHUB_TOKEN` | GitHub API | Optional server-side token for the contribution graph and authenticated rate limits |
+| `GITHUB_CACHE_MINUTES` | GitHub API | Server-side cache lifetime |
+| `ANTHROPIC_API_KEY` | Chat API | Claude provider credential |
+| `ANTHROPIC_MODEL` | Chat API | Optional Claude model override |
+| `GEMINI_API_KEY`, `GEMINI_MODEL` | Chat API | Existing Gemini integration when Claude is unconfigured |
+| `CHAT_RATE_LIMIT` | Chat API | Per-visitor request limit per ten minutes |
+| `PORT` | Express | Listening port, normally 3000 locally |
 
-You can also set them by hand under **Render > your service > Environment**.
+Only the public Formspree form ID uses a `VITE_` variable. Store provider tokens and database credentials on the server. Rebuild after changing a frontend variable. For a new production hostname, update the Open Graph image URL in `Frontend/index.html` and the hostnames in `Frontend/static/sitemap.xml` and `robots.txt`.
 
-### Creating the GitHub token
+## API routes
 
-1. Open <https://github.com/settings/tokens>.
-2. Create a **fine-grained** or **classic** personal access token.
-3. For a fine-grained token, grant **Public repositories (read-only)** under
-   repository permissions. For a classic token, no scope is required — `read:user`
-   unlocks the most data.
-4. Paste the token into Render's `GITHUB_TOKEN` value.
+| Route | Response or action |
+| --- | --- |
+| `GET /api/github` | Public profile, repository activity, contribution data when available and cache metadata |
+| `POST /api/chat` | A portfolio answer for a message and optional bounded conversation history |
+| `POST /api/contact` | Accepts name, email, subject and message |
+| `GET /api/health`, `/api/projects`, `/api/skills` | Existing Express service endpoints |
 
-The token is only ever used server-side: `backend/github.js` sends it to
-`api.github.com` and never includes it in an API response. Rotate it in GitHub
-and update Render if it is ever exposed.
-
-## MongoDB Atlas
-
-Use a free M0 cluster and create a database user. In Atlas Network Access, allow the deployed service to connect. For a simple portfolio deployment, add `0.0.0.0/0` and use a strong database password. Never commit `.env` or credentials.
-
-For local development:
-
-```powershell
-cd backend
-Copy-Item .env.example .env
-npm start
-```
-
-The local site can be opened from `Frontend/index.html`, and the local API runs on port 3000.
-
-## Verifying the GitHub dashboard
-
-```powershell
-Invoke-RestMethod -Uri http://127.0.0.1:3000/api/github |
-  Select-Object -ExpandProperty stats
-```
-
-If `GITHUB_USERNAME` is missing the endpoint answers `500 missing-username`. If
-the token is missing the dashboard still shows public repository data and reports
-`contributionsUnavailableReason: "missing-token"`, and the section renders a
-"Contribution data unavailable" state instead of inventing numbers.
+The local form and chatbot use the same paths in development and production. Vite’s development proxy points them to Express. To host the frontend separately, set `window.PORTFOLIO_API_URL` in `Frontend/config.js` to the backend URL including `/api` and rebuild.

@@ -11,10 +11,12 @@
 
 # Node dependencies
 node_modules/
+dist/
 npm-debug.log*
 
 # Local contact form submissions (visitor emails stay private)
 backend/data/contacts.json
+backend/data/contacts.json.tmp
 
 
 # Python cache

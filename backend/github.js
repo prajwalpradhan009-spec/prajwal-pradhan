@@ -46,7 +46,7 @@ class GitHubError extends Error {
 }
 
 function readConfig() {
-  const username = String(process.env.GITHUB_USERNAME || '').trim();
+  const username = String(process.env.GITHUB_USERNAME || require('../Frontend/src/data/profile.js').profile.github).trim();
   const token = String(process.env.GITHUB_TOKEN || '').trim();
   const requestedCache = Number(process.env.GITHUB_CACHE_MINUTES);
   const cacheMinutes = Number.isFinite(requestedCache)

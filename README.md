@@ -1,201 +1,49 @@
-# Prajjwal Pradhan — Portfolio
+# Prajwal Pradhan’s portfolio
 
-A fast, responsive developer portfolio built with plain HTML, CSS and JavaScript, with an optional Express API for the contact form. Light and dark themes, animated sections, and a mobile-first layout that stays smooth on tap.
+A six-section React portfolio with a layered portrait hero, scrolling skill cards, four project showcases, a biography, GitHub activity and a contact form. The site uses React 18, Vite, Tailwind CSS, Framer Motion, GSAP ScrollTrigger, Lenis and Lucide.
 
-## Highlights
+## Run locally
 
-- Fully responsive single page: Hero, About, Skills, Education, Projects, GitHub Activity, Services, Contact
-- Light / dark themes (persisted) with an animated header and scroll progress bar
-- Mobile navigation menu and touch-optimized interactions (no label taps, no sticky hover)
-- **Live GitHub Activity dashboard** — public repos, stars, forks, followers, a 12-month contribution graph and a 53-week contribution calendar, all read live from the real GitHub API on every visit
-- Project showcase with custom artwork and animations:
-  - **Northstar File Studio** — featured, PDF/image desktop utility
-  - **NovaCart** — E-commerce store, marked "Project In Progress"
-- Project detail modal with GitHub and download links
-- Downloadable HTML resume (`Frontend/resume.html`)
-- Express API with CORS, health checks, projects/skills data, GitHub proxying, and contact handling
-- MongoDB persistence with a local JSON fallback for simple development
+Use Node.js 22.12 or later. From the repository root, run:
 
-## Tech Stack
-
-**Frontend:** HTML5, CSS3, vanilla JavaScript, Lucide icons, Google Fonts (DM Mono, Manrope)
-
-**Backend:** Node.js 18+, Express, Mongoose, MongoDB, dotenv
-
-## Project Structure
-
-```text
-.
-├── Frontend/
-│   ├── index.html       Portfolio page
-│   ├── resume.html      Resume page
-│   ├── styles.css       Responsive styles, themes and animations
-│   ├── github.css       GitHub Activity dashboard styles
-│   ├── chat.css         Prajwal AI assistant styles
-│   ├── script.js        Interactions, project cards and contact logic
-│   ├── github.js        GitHub dashboard: fetch, states, chart, calendar
-│   ├── chat.js          Prajwal AI assistant: panel, conversation, rendering
-│   ├── config.js        Frontend API URL configuration
-│   ├── profile.jpg      Navbar profile logo
-│   ├── img.png          About section photo
-│   ├── novacart-logo.png  NovaCart project logo
-│   ├── northstarlogo.png Northstar project logo
-│   └── README.md        Frontend-specific notes
-├── backend/
-│   ├── server.js        Express API and static file server
-│   ├── github.js        GitHub API client, cache and /api/github route
-│   ├── chat.js          POST /api/chat route, validation and rate limiting
-│   ├── gemini.js        Google Gemini service and error mapping
-│   ├── rateLimit.js     In-memory rate limiter for the chat endpoint
-│   ├── .env.example     Environment variable template
-│   ├── package.json     Backend scripts and dependencies
-│   └── data/
-│       └── contacts.json Local fallback contact storage
-├── render.yaml          Render service configuration
-├── DEPLOYMENT.md        Deployment checklist
-└── README.md
-```
-
-## Run Locally
-
-### Frontend only
-
-The frontend has no build step or dependencies — open `Frontend/index.html` directly in a browser.
-
-The contact form and the GitHub dashboard expect the backend at `http://127.0.0.1:3000` when the page is opened with the `file:` protocol.
-
-### Full application
-
-Requirements: Node.js 18 or later. MongoDB is optional because the API falls back to `backend/data/contacts.json` when `MONGODB_URI` is not configured.
-
-```powershell
-Set-Location backend
+```sh
 npm install
-Copy-Item .env.example .env
+npm run dev
 ```
 
-Fill in `backend/.env`:
+Open the local URL printed by Vite, normally `http://localhost:5173`. The command also starts Express on port 3000 and proxies requests to `/api`. To run the production version locally, use `npm run build` followed by `npm start`, then open `http://localhost:3000`. The production frontend is in `dist/`.
 
-```env
-PORT=3000
-MONGODB_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<database>?retryWrites=true&w=majority
-GITHUB_USERNAME=<your-github-handle>
-GITHUB_TOKEN=<your-github-personal-access-token>
-```
+## Personalize
 
-Start the API:
+| File | What to edit |
+| --- | --- |
+| `Frontend/src/data/profile.js` | Name, introduction, location, services, availability, GitHub username, social links and media paths |
+| `Frontend/src/data/projects.js` | Project titles, descriptions, technologies, repository URLs and optional live links |
+| `Frontend/src/data/skills.js` | Skill groups and tools |
+| `Frontend/src/data/timeline.js` | Education and experience |
+| `Frontend/src/data/assistant.js` | Portfolio-specific local replies and the context used by Claude |
+| `Frontend/src/styles/index.css` | Palette, layout, typography, breakpoints and CSS motion |
+| `Frontend/static/` | WebP assets in `media/`, the downloadable `cv.pdf`, favicon and crawler files |
 
-```powershell
-npm start
-```
+The hero uses the original portrait and a matching CSS silhouette in `Frontend/src/portrait.css`. To use another photo, save a transparent portrait in `Frontend/static/media/`, update `profile.portrait` and set the `.cutout` clip path to `none`. Set `profile.workspace` for the About photo. The downloadable PDF and the existing printable résumé at `/resume.html` can be updated independently.
 
-Open [http://127.0.0.1:3000](http://127.0.0.1:3000) to use the portfolio through the backend. During development, `npm run dev` starts Node's watch mode.
+## Motion controls
 
-## API
+| Section | Effect | Where to adjust it |
+| --- | --- | --- |
+| Hero | Staggered type, portrait entrance, pointer parallax, scroll split and zoom | `sections/Hero.jsx` and `hooks/usePageMotion.js` |
+| Skills | Pinned horizontal track, per-card fills and outlined marquee | `sections/Skills.jsx`, `hooks/usePageMotion.js` and `.marquee` in CSS |
+| Projects | Sticky stack, outgoing card scale and dim | `.project-card` in CSS and `hooks/usePageMotion.js` |
+| About | Scrubbed bio, portrait mask and timeline line | `sections/About.jsx` and `hooks/usePageMotion.js` |
+| GitHub | Contribution wave, count-ups and staggered repositories | `sections/GithubLive.jsx`, `components/Chrome.jsx` and the `cell-in` keyframes |
+| Contact | Curtain reveal and responsive lettering | `hooks/usePageMotion.js` and `.contact-title` in CSS |
 
-| Method | Endpoint              | Description                                       |
-| ------ | --------------------- | ------------------------------------------------- |
-| `GET`  | `/api/health`         | Reports API and database status                   |
-| `GET`  | `/api/projects`       | Returns all portfolio projects                    |
-| `GET`  | `/api/projects/:slug` | Returns one project by slug                       |
-| `GET`  | `/api/skills`         | Returns skills grouped by category                |
-| `GET`  | `/api/github`         | Returns verified live GitHub data (see below)     |
-| `GET`  | `/api/github/contributions` | Returns the contribution calendar only       |
-| `POST` | `/api/contact`        | Validates and stores a contact message            |
+The paths in this table start at `Frontend/src/`. Desktop pinning requires at least 900px of width and 620px of height. Smaller screens use normal page scrolling and a swipeable skill list. Reduced-motion preferences disable scroll pinning, parallax, decorative motion and the intro curtain.
 
-Example contact request:
+## Data and delivery
 
-```powershell
-Invoke-RestMethod -Method Post `
-	-Uri http://127.0.0.1:3000/api/contact `
-	-ContentType 'application/json' `
-	-Body '{"name":"Jane Doe","email":"jane@example.com","message":"Hello!"}'
-```
+The Express service runs alongside the frontend locally and on Render. The `api/` directory adapts the chat, GitHub and contact routes for Vercel. The GitHub section reads public profile and repository data, caches it in the browser session and checks for updates every five minutes. With a server token it displays GitHub’s contribution graph. Without a token it uses the public contribution service provided by `react-github-calendar`.
 
-## GitHub Activity Dashboard
+Chat uses Claude when configured, supports the existing Gemini setup on Render and answers common portfolio questions locally when offline. Conversation history stays in browser local storage. The contact form uses an optional Formspree ID, or the existing same-origin contact endpoint. On Express that endpoint stores messages in MongoDB, with a local file fallback for development.
 
-`GET /api/github` proxies the GitHub API so the personal access token never
-reaches the browser. Every figure in the response comes straight from GitHub —
-nothing is hard-coded, estimated or filled in with placeholders.
-
-```jsonc
-{
-  "ok": true,
-  "authenticated": true,
-  "profile": { "username": "…", "name": "…", "avatarUrl": "…", "profileUrl": "…", "bio": "…", "location": "…", "followers": 0, "following": 0 },
-  "stats": { "publicRepos": 3, "totalStars": 3, "totalForks": 0, "followers": 0, "following": 0, "totalsComplete": true },
-  "repositories": [ { "name": "…", "url": "…", "language": "…", "stars": 1, "forks": 0, "topics": [], "isFork": false, "isArchived": false, "updatedAt": "…" } ],
-  "contributions": {
-    "totalContributions": 75,
-    "totalLast30Days": 29,
-    "totalLast7Days": 9,
-    "activeDays": 26,
-    "currentStreak": 0,
-    "longestStreak": 4,
-    "legend": [ { "level": 0, "name": "NONE", "color": "#ebedf0" }, { "level": 1, "name": "FIRST_QUARTILE", "color": "#9be9a8" } ],
-    "weeks": [
-      {
-        "firstDay": "2025-09-28",
-        "contributionDays": [ { "date": "2025-09-28", "contributionCount": 0, "color": "#ebedf0", "contributionLevel": "NONE", "weekday": 0 } ]
-      }
-    ]
-  },
-  "contributionsUnavailableReason": null,
-  "meta": { "fetchedAt": "…", "cacheTtlSeconds": 600, "fromCache": false, "stale": false }
-}
-```
-
-`GET /api/github/contributions` returns the `contributions` object on its own
-(plus `username`), reading through the same cache, so calling both endpoints
-costs a single upstream GraphQL request. It answers `503` with a structured
-error when no calendar is available.
-
-How it behaves:
-
-- **Automatic updates.** The frontend requests `/api/github` on load, then re-checks shortly after the server cache expires. The server caches a verified response for `GITHUB_CACHE_MINUTES` (default 10) and collapses concurrent requests into a single upstream call.
-- **Graceful degradation.** If GitHub is unreachable or rate limited, the last verified response is served with `meta.stale: true` and the dashboard labels itself "Last verified …". If nothing has ever been cached, the endpoint returns a structured error and the section shows a clean error state with a retry button.
-- **The calendar uses GitHub's reported days.** The query asks for `contributionCalendar { totalContributions weeks { contributionDays { contributionCount date color contributionLevel weekday } } }` and each square is rendered from the day GitHub returned, at the column for its week and the row for its weekday, using the portfolio legend color for its `contributionLevel`. No day is padded, reordered, filled in or estimated, which is why a quiet year legitimately shows many empty squares.
-- **GitHub's own range.** The query passes no `from`/`to`, so GitHub returns the same 52–53 week window it renders on github.com, ending today. Passing `from` explicitly makes GitHub pad the first and last weeks out to full week boundaries, which would add squares for future days that can only ever be zero.
-- **Contribution data is never faked.** Contribution history comes from GitHub's official GraphQL API, which requires authentication. Without a valid `GITHUB_TOKEN`, `contributions` is `null`, `contributionsUnavailableReason` explains why, and the section shows a "Contribution data unavailable" panel with a retry button instead of a chart.
-- **No secret in the response.** The token is only ever sent from the server to `api.github.com`; it is never included in any API response, log line, or frontend file.
-
-## Mobile & Touch
-
-- `touch-action: manipulation` prevents double-tap zoom delays on buttons and links
-- `-webkit-tap-highlight-color: transparent` removes the tap flash on iOS
-- Hover-only effects (card lifts, borders) are disabled on touch devices via `@media (hover: none)`
-- Reduced-motion users get all animations and transitions switched off
-- The contribution chart and calendar scroll horizontally on narrow screens instead of shrinking into unreadable squares, and every square keeps a 1:1 aspect ratio
-
-## Deployment
-
-### Render
-
-Create a Render Blueprint from this repository. Render uses the included `render.yaml` to install dependencies and start the Express service, which serves both the portfolio frontend and the API.
-
-Set these as secret environment variables in Render:
-
-| Variable                | Required | Purpose                                            |
-| ----------------------- | -------- | -------------------------------------------------- |
-| `MONGODB_URI`           | No       | Contact form storage; falls back to a local file   |
-| `GITHUB_USERNAME`       | Yes      | GitHub account the dashboard reads                 |
-| `GITHUB_TOKEN`          | Yes      | Personal access token, server-side only            |
-| `GITHUB_CACHE_MINUTES`  | No       | Cache lifetime, 1–60 (default 10)                 |
-
-After deployment, the portfolio is available at the Render service URL and the API under `/api`.
-
-If the frontend is hosted separately, set its API base URL in `Frontend/config.js`:
-
-```js
-window.PORTFOLIO_API_URL = "https://your-api.onrender.com/api";
-```
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for the deployment checklist.
-
-## Security
-
-Never commit `backend/.env`, MongoDB credentials, GitHub tokens, or API keys. `.env` files are excluded by `.gitignore` while `.env.example` stays tracked as a template. The GitHub token is read from `process.env` inside `backend/github.js` and is never sent to the frontend.
-
-## License
-
-This project is for personal portfolio use.
+See [deployment and environment settings](DEPLOYMENT.md) for Render and Vercel.

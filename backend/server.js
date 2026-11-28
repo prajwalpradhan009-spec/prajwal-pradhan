@@ -6,6 +6,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose'); // Added Mongoose
 const { registerGitHubRoutes } = require('./github');
+const { validateContact } = require('./contact');
 const { registerChatRoutes, isGeminiConfigured, getConfiguredModel } = require('./chat');
 
 // Loads variables from .env file
@@ -32,11 +33,13 @@ const app = express();
 const port = Number(process.env.PORT || 3000);
 const mongoUri = process.env.MONGODB_URI;
 const contactsFile = path.join(__dirname, 'data', 'contacts.json');
+const frontendBuild = path.join(__dirname, '..', 'dist');
 
 // 1. Create a Mongoose Schema and Model for your Contacts
 const contactSchema = new mongoose.Schema({
   name: String,
   email: String,
+  subject: String,
   message: String,
   createdAt: { type: Date, default: Date.now }
 });
@@ -93,13 +96,12 @@ app.get(pageRoutes, (request, response) => {
     const query = request.originalUrl.slice(request.path.length);
     return response.redirect(308, canonicalPath + query);
   }
-  response.sendFile(path.join(__dirname, '..', 'Frontend', 'public', 'index.html'));
+  response.sendFile(path.join(frontendBuild, 'index.html'));
 });
 app.get('/prajwal-pradhan', (request, response) => {
-  response.sendFile(path.join(__dirname, '..', 'Frontend', 'prajwal-pradhan.html'));
+  response.sendFile(path.join(frontendBuild, 'prajwal-pradhan.html'));
 });
-app.use(express.static(path.join(__dirname, '..', 'Frontend')));
-app.use(express.static(path.join(__dirname, '..', 'Frontend', 'public')));
+app.use(express.static(frontendBuild));
 
 const projects = [
   { slug: 'northstar-file-studio', title: 'Northstar File Studio', description: 'A focused utility for merging PDFs and converting, compressing and organizing images.', technologies: ['Python', 'CustomTkinter', 'Pillow'] },
@@ -112,16 +114,9 @@ const skills = {
   tools: ['GitHub', 'VS Code', 'UI / UX', 'AI tools']
 };
 
-function validateContact(body = {}) {
-  const name = String(body.name || '').trim();
-  const email = String(body.email || '').trim();
-  const message = String(body.message || '').trim();
-  if (!name || !email || !message) return { error: 'Name, email and message are required' };
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return { error: 'Please provide a valid email address' };
-  return { name, email, message };
-}
-
-async function saveContactToFile(contact) {
+let lastContactWrite = Promise.resolve();
+async function appendContact(contact) {
+  await fs.mkdir(path.dirname(contactsFile), { recursive: true });
   let contacts = [];
   try {
     contacts = JSON.parse(await fs.readFile(contactsFile, 'utf8'));
@@ -129,7 +124,15 @@ async function saveContactToFile(contact) {
     if (error.code !== 'ENOENT') throw error;
   }
   contacts.push({ ...contact, created_at: new Date().toISOString() });
-  await fs.writeFile(contactsFile, `${JSON.stringify(contacts, null, 2)}\n`);
+  const temporary = contactsFile + '.tmp';
+  await fs.writeFile(temporary, `${JSON.stringify(contacts, null, 2)}\n`);
+  await fs.rename(temporary, contactsFile);
+}
+
+function saveContactToFile(contact) {
+  const nextWrite = lastContactWrite.then(() => appendContact(contact));
+  lastContactWrite = nextWrite.catch(() => {});
+  return nextWrite;
 }
 
 app.get('/api/health', (request, response) => {
@@ -198,13 +201,15 @@ async function startServer() {
   if (process.env.GITHUB_USERNAME) {
     console.log(`GitHub activity enabled for ${process.env.GITHUB_USERNAME} (${process.env.GITHUB_TOKEN ? 'authenticated' : 'public data only'}).`);
   } else {
-    console.warn(`GITHUB_USERNAME is not set, so /api/github will report a configuration error. ${CONFIG_HINT}`);
+    console.log('GitHub activity uses the username in the portfolio profile.');
   }
 
-  if (isGeminiConfigured()) {
+  if (process.env.ANTHROPIC_API_KEY) {
+    console.log('Portfolio assistant uses the configured Claude provider.');
+  } else if (isGeminiConfigured()) {
     console.log(`Prajwal AI enabled (model: ${getConfiguredModel()}).`);
   } else {
-    console.warn(`GEMINI_API_KEY is not set, so /api/chat will report that Prajwal AI is unavailable. ${CONFIG_HINT}`);
+    console.log('Portfolio assistant uses local profile answers.');
   }
 
   app.listen(port, '0.0.0.0', () => {

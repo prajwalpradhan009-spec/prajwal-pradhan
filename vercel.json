@@ -1,0 +1,9 @@
+{
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    { "source": "/prajwal-pradhan", "destination": "/prajwal-pradhan.html" },
+    { "source": "/(home|about|learning|education|skills|projects|github|services|contact|profile|public|public/index.html)", "destination": "/index.html" }
+  ]
+}

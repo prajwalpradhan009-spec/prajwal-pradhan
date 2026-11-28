@@ -11,12 +11,12 @@
 
 const express = require('express');
 const {
-  generateReply,
   isGeminiConfigured,
   getConfiguredModel,
   scrubSecrets,
   GeminiError,
 } = require('./gemini');
+const { portfolioReply } = require('./portfolioReply');
 const { createRateLimiter } = require('./rateLimit');
 
 const MAX_MESSAGE_LENGTH = 2000;
@@ -149,7 +149,7 @@ function registerChatRoutes(app) {
       }
 
       try {
-        const reply = await generateReply(value);
+        const reply = await portfolioReply(value);
         if (cacheKey) writeCachedAnswer(cacheKey, reply);
         return response.json({ reply });
       } catch (chatError) {

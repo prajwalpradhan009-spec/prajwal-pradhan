@@ -3,7 +3,7 @@ services:
     name: prajwal-portfolio
     runtime: node
     rootDir: .
-    buildCommand: npm --prefix backend ci
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm --prefix backend start
     envVars:
       - key: MONGODB_URI
