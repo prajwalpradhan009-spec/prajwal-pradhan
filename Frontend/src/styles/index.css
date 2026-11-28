@@ -231,8 +231,7 @@ body:has(dialog[open]) {
 .menu-toggle {
   display: none;
 }
-.masthead.on-skills,
-.masthead.on-github {
+.masthead.on-skills {
   background: #111110;
   color: var(--paper);
 }
@@ -917,7 +916,27 @@ body:has(dialog[open]) {
   color: var(--ink);
 }
 .github {
-  background: linear-gradient(140deg, #101010, #212120);
+  --gh-card: #F2F0EB;
+  --gh-line: #8C8881;
+}
+.github,
+.masthead.on-github {
+  background: #D6D2CB;
+  color: #0D0D0D;
+}
+.github,
+.masthead.on-github,
+.section-rail.on-github {
+  --orange: #FF531A;
+}
+.github .pill.outline:hover,
+.github .pill.outline:focus-visible {
+  background: var(--orange);
+  border-color: currentColor;
+}
+.github :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 .gh-overview,
 .gh-stats,
@@ -926,9 +945,9 @@ body:has(dialog[open]) {
 .repo-grid > a,
 .github-error,
 .github-skeleton {
-  background: #232321;
-  border: 1px solid #3a3a35;
-  border-radius: 7px;
+  background: var(--gh-card);
+  border: 1px solid var(--gh-line);
+  border-radius: 4px;
 }
 .gh-overview {
   display: flex;
@@ -952,11 +971,15 @@ body:has(dialog[open]) {
 }
 .gh-person a {
   font: 400 0.78rem var(--mono);
-  color: #ff915c;
+  text-decoration: underline;
+  text-decoration-color: var(--orange);
+  text-underline-offset: 0.22em;
+}
+.gh-person a:hover {
+  text-decoration-thickness: 2px;
 }
 .gh-overview > p {
   max-width: 52ch;
-  color: #cfcdc5;
   font-size: 0.94rem;
 }
 .gh-stats {
@@ -970,7 +993,7 @@ body:has(dialog[open]) {
   padding: 1.15rem 1.5rem;
 }
 .gh-stats > div + div {
-  border-left: 1px solid #464640;
+  border-left: 1px solid var(--gh-line);
 }
 .gh-stats b {
   font: 400 2.5rem/1 var(--display);
@@ -978,10 +1001,22 @@ body:has(dialog[open]) {
 .gh-stats span:not(b span),
 .activity-box small {
   font-size: 0.78rem;
-  color: #cfcdc5;
 }
 .activity-box {
+  position: relative;
   padding: 1.4rem;
+}
+.gh-tooltip {
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  max-width: calc(100% - 8px);
+  padding: 0.35rem 0.6rem;
+  border-radius: 3px;
+  background: #0D0D0D;
+  color: var(--gh-card);
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 .calendar-scroll {
   overflow: auto;
@@ -1003,11 +1038,7 @@ body:has(dialog[open]) {
   border-radius: 2px;
 }
 .heatmap i[data-level='0'] {
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-.heat-cell[data-level='0'] {
-  stroke: rgba(255, 255, 255, 0.05);
-  stroke-width: 1px;
+  border: 1px solid rgb(13 13 13 / 12%);
 }
 .heatmap i,
 .heat-cell {
@@ -1051,18 +1082,18 @@ body:has(dialog[open]) {
   align-items: start;
   gap: 0.7rem;
 }
-.repo-grid > a:hover {
+.repo-grid > a:hover,
+.repo-grid > a:focus-visible {
   border-color: var(--orange);
 }
 .repo-grid > a > svg {
-  color: #87b89c;
+  color: var(--orange);
 }
 .repo-grid h3 {
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 .repo-grid p {
-  color: #cecdc4;
   font-size: 0.9rem;
 }
 .repo-meta {
@@ -1070,7 +1101,6 @@ body:has(dialog[open]) {
   flex-wrap: wrap;
   font-size: 0.71rem;
   margin-top: auto;
-  color: #c8c7bd;
   padding-top: 0.75rem;
 }
 .repo-meta > span {
@@ -1087,9 +1117,56 @@ body:has(dialog[open]) {
 }
 .github-skeleton {
   min-height: 200px;
-  background: linear-gradient(105deg, #222 20%, #30302d 40%, #222 60%);
+  background: linear-gradient(105deg, var(--gh-card) 20%, #E4E0D9 40%, var(--gh-card) 60%);
   background-size: 300% 100%;
   animation: skeleton 2s infinite;
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .gh-overview,
+  .gh-stats {
+    position: relative;
+    isolation: isolate;
+    overflow: clip;
+    transform: perspective(1400px) rotateX(calc(var(--gh-y, 0) * -3deg)) rotateY(calc(var(--gh-x, 0) * 1.6deg));
+    transition: transform 220ms ease-out;
+  }
+  .gh-overview::before,
+  .gh-stats::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    width: 22rem;
+    height: 22rem;
+    left: calc(50% + var(--gh-x, 0) * 100%);
+    top: calc(50% + var(--gh-y, 0) * 100%);
+    translate: -50% -50%;
+    background: radial-gradient(closest-side, rgb(255 83 26 / 12%), transparent);
+    opacity: 0;
+    transition: left 150ms ease-out, top 150ms ease-out, opacity 220ms ease-out;
+  }
+  .gh-overview[data-tracking]::before,
+  .gh-stats[data-tracking]::before {
+    opacity: 1;
+  }
+  .github .section-heading .pill {
+    translate: calc(var(--gh-x, 0) * 10px) calc(var(--gh-y, 0) * 6px);
+  }
+  .github [data-gh-day] {
+    transform-box: fill-box;
+    transform-origin: center;
+    transition: scale 140ms ease-out, filter 140ms ease-out;
+  }
+  .github [data-gh-day]:hover {
+    scale: 1.12;
+    filter: drop-shadow(0 0 0.7px #0D0D0D);
+  }
+  .repo-grid > a {
+    transition: translate 180ms ease-out, border-color 180ms ease-out;
+  }
+  .repo-grid > a:hover {
+    translate: 0 -2px;
+  }
 }
 @keyframes skeleton {
   to {
@@ -1232,7 +1309,7 @@ body:has(dialog[open]) {
   --chat-accent: var(--mist);
 }
 .chat-root.on-github {
-  --chat-accent: #87cb9b;
+  --chat-accent: #FF531A;
 }
 .chat-root.on-contact {
   --chat-accent: var(--ink);
@@ -1739,7 +1816,7 @@ body:has(dialog[open]) {
     border-left: 0;
   }
   .gh-stats > div:nth-child(n + 3) {
-    border-top: 1px solid #464640;
+    border-top: 1px solid var(--gh-line);
   }
   .github .section-heading {
     align-items: center;

@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useRef } from 'react'
+import React, { Suspense, lazy, useEffect, useRef } from 'react'
 import { useInView, motion, useReducedMotion } from 'framer-motion'
 import { Github, GitFork, Star, BookMarked, RefreshCw } from 'lucide-react'
 import { Count } from '../components/Chrome'
@@ -6,9 +6,37 @@ import { profile } from '../data/profile'
 import { useGithub } from '../hooks/useGithub'
 
 const Calendar = lazy(() => import('react-github-calendar'))
-const palette = ['#32322f', '#76381e', '#ac461e', '#e96126', '#ff965f']
-const calendarPalette = ['#161B22', '#0E4429', '#006D32', '#26A641', '#39D353']
+const languagePalette = ['#FF531A', '#0D0D0D', '#595650', '#817C74']
+const calendarPalette = ['#EBEDF0', '#9BE9A8', '#40C463', '#30A14E', '#216E39']
 const levels = ['NONE', 'FIRST_QUARTILE', 'SECOND_QUARTILE', 'THIRD_QUARTILE', 'FOURTH_QUARTILE']
+const mouseMotion = '(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)'
+
+function followPointer(event) {
+  if (event.pointerType !== 'mouse' || !window.matchMedia(mouseMotion).matches) return
+  const card = event.currentTarget
+  const bounds = card.getBoundingClientRect()
+  card.style.setProperty('--gh-x', (event.clientX - bounds.left) / bounds.width - 0.5)
+  card.style.setProperty('--gh-y', (event.clientY - bounds.top) / bounds.height - 0.5)
+  card.dataset.tracking = 'true'
+}
+
+function resetPointer(event) {
+  const card = event.currentTarget
+  delete card.dataset.tracking
+  card.style.removeProperty('--gh-x')
+  card.style.removeProperty('--gh-y')
+}
+
+const pointerEvents = {
+  onPointerMove: followPointer,
+  onPointerLeave: resetPointer,
+  onPointerCancel: resetPointer,
+}
+
+function dayLabel(day) {
+  const count = day.contributionCount ?? day.count
+  return day.date + ' · ' + count + (count === 1 ? ' contribution' : ' contributions')
+}
 
 function contributionLevel(day) {
   const value = day.contributionLevel ?? day.level
@@ -21,6 +49,31 @@ function contributionLevel(day) {
 
 function CalendarView({ data, refreshed }) {
   const cal = data.contributions
+  const tooltip = useRef(null)
+  const hideTooltip = () => { tooltip.current.hidden = true }
+  const showTooltip = (event) => {
+    const cell = event.target.closest('[data-gh-day]')
+    if (!cell) return hideTooltip()
+    const tip = tooltip.current
+    const card = tip.parentElement
+    const bounds = card.getBoundingClientRect()
+    const square = cell.getBoundingClientRect()
+    tip.textContent = cell.getAttribute('aria-label')
+    tip.hidden = false
+    const left = square.left - bounds.left + (square.width - tip.offsetWidth) / 2
+    tip.style.left = Math.max(4, Math.min(left, card.clientWidth - tip.offsetWidth - 4)) + 'px'
+    tip.style.top = square.top - bounds.top - tip.offsetHeight - 6 + 'px'
+  }
+
+  useEffect(() => {
+    hideTooltip()
+    const dismissOutside = (event) => {
+      if (!tooltip.current.parentElement.contains(event.target)) hideTooltip()
+    }
+    document.addEventListener('pointerdown', dismissOutside)
+    return () => document.removeEventListener('pointerdown', dismissOutside)
+  }, [refreshed])
+
   return (
     <div className="activity-box">
       <h3>
@@ -31,6 +84,11 @@ function CalendarView({ data, refreshed }) {
         tabIndex="0"
         role="region"
         aria-label="GitHub contribution calendar"
+        onPointerOver={showTooltip}
+        onClick={showTooltip}
+        onPointerLeave={hideTooltip}
+        onScrollCapture={hideTooltip}
+        onKeyDown={(event) => { if (event.key === 'Escape') hideTooltip() }}
       >
         {cal?.weeks ? (
           <>
@@ -43,7 +101,9 @@ function CalendarView({ data, refreshed }) {
                       <i
                         key={day.date}
                         data-level={level}
-                        title={day.date + ' · ' + day.contributionCount + ' contributions'}
+                        data-gh-day=""
+                        role="img"
+                        aria-label={dayLabel(day)}
                         style={{
                           gridRow: day.weekday + 1,
                           background: calendarPalette[level],
@@ -63,27 +123,34 @@ function CalendarView({ data, refreshed }) {
               key={refreshed}
               username={data.profile.username}
               year={new Date().getFullYear()}
-              theme={{ dark: calendarPalette }}
-              transformData={(days) => days.map((day) => ({ ...day, level: contributionLevel(day) }))}
+              theme={{ light: calendarPalette }}
+              transformData={(days) => days.map((day) => ({
+                ...day, level: contributionLevel(day), label: dayLabel(day),
+              }))}
               transformTotalCount={false}
-              colorScheme="dark"
+              colorScheme="light"
               blockSize={11}
               blockMargin={4}
               fontSize={13}
               errorMessage="The contribution calendar is temporarily unavailable."
               renderBlock={(block, day) =>
-                React.cloneElement(block, {
+                day.label ? React.cloneElement(block, {
                   className: 'heat-cell',
+                  'data-gh-day': '',
+                  role: 'img',
+                  'aria-label': day.label,
                   style: {
+                    ...block.props.style,
                     '--wave':
                       new Date(day.date).getUTCDay() * 21 + Number(day.date.slice(-2)) * 5 + 'ms',
                   },
-                })
+                }) : block
               }
             />
           </Suspense>
         )}
       </div>
+      <span ref={tooltip} role="tooltip" className="gh-tooltip" hidden />
     </div>
   )
 }
@@ -117,6 +184,7 @@ export default function GithubLive() {
             target="_blank"
             rel="noreferrer"
             className="pill outline"
+            {...pointerEvents}
           >
             <Github size={16} />
             Visit GitHub
@@ -140,7 +208,7 @@ export default function GithubLive() {
         )}
         {data && (
           <>
-            <div className="gh-overview">
+            <div className="gh-overview" {...pointerEvents}>
               <div className="gh-person">
                 <img
                   loading="lazy"
@@ -159,7 +227,7 @@ export default function GithubLive() {
                   'Full-stack development, Python tools and open-source projects.'}
               </p>
             </div>
-            <div className="gh-stats">
+            <div className="gh-stats" {...pointerEvents}>
               {[
                 ['Public repos', data.stats.publicRepos],
                 ['Followers', data.stats.followers],
@@ -182,7 +250,7 @@ export default function GithubLive() {
                   <div key={name}>
                     <i
                       style={{
-                        background: palette[4 - i],
+                        background: languagePalette[i],
                         height: 4,
                         width: 32 + (60 * n) / ordered[0][1] + '%',
                       }}
