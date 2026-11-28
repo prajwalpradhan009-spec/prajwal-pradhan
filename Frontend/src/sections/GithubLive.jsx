@@ -7,9 +7,20 @@ import { useGithub } from '../hooks/useGithub'
 
 const Calendar = lazy(() => import('react-github-calendar'))
 const palette = ['#32322f', '#76381e', '#ac461e', '#e96126', '#ff965f']
+const calendarPalette = ['#161B22', '#0E4429', '#006D32', '#26A641', '#39D353']
+const levels = ['NONE', 'FIRST_QUARTILE', 'SECOND_QUARTILE', 'THIRD_QUARTILE', 'FOURTH_QUARTILE']
+
+function contributionLevel(day) {
+  const value = day.contributionLevel ?? day.level
+  const level = levels.indexOf(value)
+  if (level >= 0) return level
+  if (Number.isInteger(value) && value >= 0 && value <= 4) return value
+  const count = day.contributionCount ?? day.count ?? 0
+  return Math.min(4, Math.ceil(count / 3))
+}
+
 function CalendarView({ data, refreshed }) {
   const cal = data.contributions
-  const levels = ['NONE', 'FIRST_QUARTILE', 'SECOND_QUARTILE', 'THIRD_QUARTILE', 'FOURTH_QUARTILE']
   return (
     <div className="activity-box">
       <h3>
@@ -26,17 +37,21 @@ function CalendarView({ data, refreshed }) {
             <div className="heatmap">
               {cal.weeks.map((week, x) => (
                 <div key={week.firstDay}>
-                  {week.contributionDays.map((day) => (
-                    <i
-                      key={day.date}
-                      title={day.date + ' · ' + day.contributionCount + ' contributions'}
-                      style={{
-                        gridRow: day.weekday + 1,
-                        background: palette[Math.max(0, levels.indexOf(day.contributionLevel))],
-                        '--wave': (x + day.weekday) * 9 + 'ms',
-                      }}
-                    />
-                  ))}
+                  {week.contributionDays.map((day) => {
+                    const level = contributionLevel(day)
+                    return (
+                      <i
+                        key={day.date}
+                        data-level={level}
+                        title={day.date + ' · ' + day.contributionCount + ' contributions'}
+                        style={{
+                          gridRow: day.weekday + 1,
+                          background: calendarPalette[level],
+                          '--wave': (x + day.weekday) * 9 + 'ms',
+                        }}
+                      />
+                    )
+                  })}
                 </div>
               ))}
             </div>
@@ -48,7 +63,9 @@ function CalendarView({ data, refreshed }) {
               key={refreshed}
               username={data.profile.username}
               year={new Date().getFullYear()}
-              theme={{ dark: palette }}
+              theme={{ dark: calendarPalette }}
+              transformData={(days) => days.map((day) => ({ ...day, level: contributionLevel(day) }))}
+              transformTotalCount={false}
               colorScheme="dark"
               blockSize={11}
               blockMargin={4}

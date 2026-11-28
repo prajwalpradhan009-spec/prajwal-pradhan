@@ -396,7 +396,6 @@ body:has(dialog[open]) {
 }
 .hero-portrait {
   object-fit: contain;
-  filter: grayscale(1) contrast(1.05);
   translate: var(--px, 0px) var(--py, 0px);
 }
 .hero-intro,
@@ -619,6 +618,12 @@ body:has(dialog[open]) {
   padding-top: 0.82rem;
   font-size: 0.91rem;
 }
+.skill-card li > span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 1lh;
+}
 .skill-rule {
   height: 2px;
   background: #44443f;
@@ -818,7 +823,6 @@ body:has(dialog[open]) {
   bottom: 0;
   height: 86%;
   width: auto;
-  filter: grayscale(1);
 }
 .about {
   background: var(--navy);
@@ -992,6 +996,13 @@ body:has(dialog[open]) {
 .heatmap i {
   width: 12px;
   border-radius: 2px;
+}
+.heatmap i[data-level='0'] {
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.heat-cell[data-level='0'] {
+  stroke: rgba(255, 255, 255, 0.05);
+  stroke-width: 1px;
 }
 .heatmap i,
 .heat-cell {
