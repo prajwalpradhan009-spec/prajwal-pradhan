@@ -35,21 +35,6 @@ export function usePageMotion(page) {
           ease: 'none',
           scrollTrigger: { trigger: '#home', start: '15% top', end: 'bottom top', scrub: true },
         })
-        const stage = root.querySelector('.skills-stage'),
-          track = root.querySelector('.skills-track')
-        const travel = () => Math.max(0, track.scrollWidth - track.parentElement.clientWidth)
-        gsap.to(track, {
-          x: () => -travel(),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: stage,
-            start: 'center center',
-            end: () => '+=' + Math.max(travel(), 300),
-            pin: true,
-            scrub: 0.5,
-            invalidateOnRefresh: true,
-          },
-        })
         const cards = gsap.utils.toArray('.project-card', root)
         cards
           .slice(0, -1)

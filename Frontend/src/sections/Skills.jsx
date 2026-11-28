@@ -1,6 +1,6 @@
-import React from 'react'
-import { AudioLines, LayoutTemplate, Server, Terminal } from 'lucide-react'
-import { motion, useReducedMotion } from 'framer-motion'
+import React, { useEffect, useRef } from 'react'
+import { useInView } from 'framer-motion'
+import gsap from 'gsap'
 import {
   SiCss3, SiExpress, SiFastapi, SiGit, SiGithub, SiHtml5, SiJavascript, SiMongodb,
   SiMysql, SiNodedotjs, SiOpenai, SiPostman, SiPython, SiReact, SiTailwindcss, SiVisualstudiocode,
@@ -8,7 +8,10 @@ import {
 import ollamaLogo from '../../assets/skills/ollama.svg'
 import { skills } from '../data/skills'
 
-const icons = { layout: LayoutTemplate, server: Server, audio: AudioLines, terminal: Terminal }
+const rows = [
+  [skills[0], skills[2]],
+  [skills[1], skills[3]],
+]
 const brands = {
   React: [SiReact, '#61DAFB'],
   JavaScript: [SiJavascript, '#F7DF1E'],
@@ -35,8 +38,65 @@ function SkillLogo({ name }) {
   return <Logo size={28} color={color} role="img" aria-label={name + ' logo'} />
 }
 
+function SkillRow({ groups, direction }) {
+  const row = useRef(null)
+  const track = useRef(null)
+  const targetSpeed = useRef(direction)
+  const position = useRef(0)
+  const visible = useInView(row)
+
+  useEffect(() => {
+    if (!visible) return
+    const media = gsap.matchMedia()
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      let speed = targetSpeed.current
+      const advance = (_, elapsed) => {
+        const seconds = Math.min(elapsed, 64) / 1000
+        speed += (targetSpeed.current - speed) * (1 - Math.exp(-8 * seconds))
+        // The second copy starts halfway along the track, so wrapping here is seamless.
+        position.current = gsap.utils.wrap(-50, 0, position.current + speed * seconds * 1.5)
+        track.current.style.transform = `translate3d(${position.current}%, 0, 0)`
+      }
+      gsap.ticker.add(advance)
+      return () => gsap.ticker.remove(advance)
+    })
+    return () => media.revert()
+  }, [visible])
+
+  const steer = (event) => {
+    if (event.pointerType !== 'mouse') return
+    const bounds = row.current.getBoundingClientRect()
+    const relativeX = (event.clientX - bounds.left) / bounds.width
+    targetSpeed.current = (relativeX - 0.5) * 5
+  }
+  const items = groups.flatMap((group) => group.items.flatMap((item) => item.split(' & ')))
+  return (
+    <div
+      ref={row}
+      className="skills-row"
+      role="region"
+      aria-label={groups.map((group) => group.name).join(', ')}
+      tabIndex={0}
+      onPointerMove={steer}
+      onPointerLeave={() => { targetSpeed.current = direction }}
+    >
+      <div ref={track} className="skills-track">
+        {[false, true].map((copy) => (
+          <ul key={String(copy)} aria-hidden={copy || undefined}>
+            {items.map((name) => (
+              <li key={name} className="skill-card">
+                <SkillLogo name={name} />
+                {name}
+              </li>
+            ))}
+          </ul>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Skills() {
-  const reduce = useReducedMotion()
   return (
     <section id="skills" className="skills dark-section">
       <div className="skills-stage">
@@ -49,56 +109,10 @@ export default function Skills() {
             What I build with<span>.</span>
           </h2>
         </div>
-        <div className="marquee" aria-hidden="true">
-          {[0, 1].map((n) => (
-            <span key={n}>REACT · PYTHON · NODE.JS · MONGODB · GIT · </span>
+        <div className="skills-window">
+          {rows.map((groups, index) => (
+            <SkillRow key={groups[0].name} groups={groups} direction={index === 0 ? -1 : 1} />
           ))}
-        </div>
-        <div
-          className="skills-window"
-          tabIndex="0"
-          role="region"
-          aria-label="Skill groups, scroll horizontally on small screens"
-        >
-          <div className="skills-track">
-            {skills.map(({ name, tool, icon, items }) => {
-              const Icon = icons[icon]
-              return (
-                <article key={name} className="skill-card">
-                  <div className="skill-icon">
-                    <Icon size={25} strokeWidth={1.4} />
-                  </div>
-                  <div className="skill-title">
-                    <h3>{name}</h3>
-                    <span className="mono">{tool}</span>
-                  </div>
-                  <ul>
-                    {items.map((item, i) => (
-                      <li key={item}>
-                        <span>
-                          {item.split(' & ').map((name, index) => (
-                            <React.Fragment key={name}>
-                              {index > 0 && ' & '}
-                              <SkillLogo name={name} />
-                              {name}
-                            </React.Fragment>
-                          ))}
-                        </span>
-                        <div aria-hidden="true" className="skill-rule">
-                          <motion.i
-                            initial={reduce ? false : { scaleX: 0 }}
-                            whileInView={{ scaleX: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.7, delay: i * 0.06 }}
-                          />
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              )
-            })}
-          </div>
         </div>
       </div>
     </section>
