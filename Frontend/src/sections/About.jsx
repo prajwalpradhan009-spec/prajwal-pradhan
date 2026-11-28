@@ -2,8 +2,16 @@ import React from 'react'
 import { Download } from 'lucide-react'
 import { profile } from '../data/profile'
 import { timeline } from '../data/timeline'
+import '@fontsource/spectral/latin-400.css'
+import '@fontsource/spectral/latin-600-italic.css'
 
 export default function About() {
+  const followReadingPosition = (event) => {
+    if (event.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const bio = event.currentTarget
+    bio.style.setProperty('--reading-y', event.clientY - bio.getBoundingClientRect().top + 'px')
+  }
+
   const magnet = (e) => {
     if (e.pointerType !== 'mouse' || matchMedia('(prefers-reduced-motion:reduce)').matches) return
     const r = e.currentTarget.getBoundingClientRect()
@@ -40,7 +48,7 @@ export default function About() {
               </React.Fragment>
             ))}
           </h2>
-          <div className="bio-details">
+          <div className="bio-details" onPointerMove={followReadingPosition}>
             {profile.bioParagraphs.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
             ))}
